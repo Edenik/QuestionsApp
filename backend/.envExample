@@ -1,0 +1,25 @@
+
+NODE_ENV = development
+
+# server config
+PORT = 8080
+
+#sql server config
+SQL_USER = sa
+SQL_PASSWORD = 1234
+SQL_DATABASE = QuestionsApp
+SQL_SERVER = 127.0.0.1
+SQL_PORT = 1433
+SQL_INSTANCE_NAME = SQLEXPRESS
+
+#JSONWEBTOKEN SECRET
+JWT_SECRET = "Hack3r5eYe!.?T3st#%@By^&*3D3N1k"
+
+#admin user
+ADMIN_EMAIL = youradmin@gmail.com
+ADMIN_USERNAME = adminUserName
+ADMIN_PASSWORD = 123456
+#test user 
+TEST_EMAIL = test@gmail.com
+TEST_USERNAME = TEST
+TEST_PASSWORD = 123456
