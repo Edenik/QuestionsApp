@@ -7,6 +7,11 @@ const dbClient = require("../utils/dbClient");
 const bcrypt = require("bcryptjs");
 const AppError = require("../utils/appError");
 
+const signToken = (id) => {
+  return jsonwebtoken.sign({ id }, config.jwtSecret, {
+    expiresIn: "7d",
+  });
+};
 const onCreate = catchAsync(async (req, res, next) => {
   const newUser = await signup({ user: req.body.userOBJ, jwt: true });
 
@@ -54,13 +59,7 @@ const signup = async ({ user, jwt }) => {
       });
     let token;
     if (jwt === true) {
-      token = jsonwebtoken.sign(
-        { id: newUser.recordsets[0][0].id },
-        config.jwtSecret,
-        {
-          expiresIn: "7d",
-        }
-      );
+      token = signToken(newUser.recordsets[0][0].id);
     }
     return { id: newUser.recordsets[0][0]["id"], token };
   } catch (err) {
@@ -68,21 +67,48 @@ const signup = async ({ user, jwt }) => {
   }
 };
 
-const login = (req, res, next) => {
+const login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
-  // check if email and password exist
   if (!email || !password) {
     next(new AppError("Please provide email and password!", 400));
   }
-  // check if user exists && password is correct
 
-  // if everything ok , send token
-  const token = "";
+  const findUserByEmailQuery = `SELECT [_ID]
+  ,[email]
+  ,[username]
+  ,[password]
+  ,[role]
+  ,[highscore]
+FROM [QuizApp].[dbo].[users] 
+WHERE email = '${email}'`;
+  const pool = await dbClient.getConnection(config.sql);
+
+  let userFromDb = await pool.request().query(findUserByEmailQuery);
+  userFromDb = { ...userFromDb.recordsets[0][0] };
+
+  const user = new User(
+    userFromDb.email,
+    userFromDb.username,
+    userFromDb.password,
+    userFromDb.role
+  );
+  user.setId(userFromDb._ID);
+
+  if (
+    !userFromDb.email ||
+    !userFromDb.password ||
+    !(await user.checkPassword(password, user.getPassword()))
+  ) {
+    next(new AppError("Incorrect email or password!", 401));
+  }
+
+  const token = signToken(user.getId());
   res.status(200).json({
     status: "success",
+    user,
     token,
   });
-};
+});
 
 module.exports = { onCreate, signup, login };

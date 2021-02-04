@@ -1,3 +1,5 @@
+const bcrypt = require("bcryptjs");
+
 class User {
   constructor(email, username, password, role = "user", id) {
     this.email = email;
@@ -54,6 +56,10 @@ class User {
 
   setId(id) {
     this.id = id;
+  }
+
+  async checkPassword(candidatePassword, userPassword) {
+    return await bcrypt.compare(candidatePassword, userPassword);
   }
 }
 
