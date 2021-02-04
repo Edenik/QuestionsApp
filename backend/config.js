@@ -17,7 +17,8 @@ const {
   TEST_USERNAME,
   TEST_PASSWORD,
   JWT_SECRET,
-  JWT_EXPIRES_IN,
+  EMAIL_USERNAME,
+  EMAIL_PASSWORD,
 } = process.env;
 
 module.exports = {
@@ -44,5 +45,9 @@ module.exports = {
     TEST_EMAIL,
     TEST_USERNAME,
     TEST_PASSWORD,
+  },
+  nodemailer: {
+    EMAIL_USERNAME,
+    EMAIL_PASSWORD,
   },
 };

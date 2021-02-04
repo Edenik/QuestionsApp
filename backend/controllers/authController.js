@@ -6,6 +6,7 @@ const catchAsync = require("../utils/catchAsync");
 const dbClient = require("../utils/dbClient");
 const bcrypt = require("bcryptjs");
 const AppError = require("../utils/appError");
+const sendEmail = require("../utils/email");
 
 const signToken = (id) => {
   return jws.sign({ id }, config.jwtSecret, {
@@ -166,23 +167,57 @@ const forgotPassword = catchAsync(async (req, res, next) => {
   }
   const resetToken = currentUser.createPasswordResetToken();
 
+  await updateUserToken({
+    id: currentUser.id,
+    token: currentUser.getPasswordResetToken(),
+    expire: new Date(currentUser.getPasswordResetExpires()).toISOString(),
+  });
+
+  const resetURL = `${req.protocol}://${req.get(
+    "host"
+  )}/api/v1/users/resetPassword/${resetToken}`;
+
+  const message = `Forgot your password? Go to ${resetURL}. \nIf you didn't please ignore this email.`;
+
+  try {
+    await sendEmail({
+      email: req.body.email,
+      subject: "Your password reset token - QuizApp",
+      message,
+    }).catch((err) => console.log(err));
+    res.status(200).json({
+      status: "success",
+      message: `Reset instructions was sent to ${req.body.email}!`,
+    });
+  } catch (err) {
+    await updateUserToken({ id: currentUser.id, token: null, expire: null });
+
+    return next(
+      new AppError(
+        "There was an error sending the email. Try again later!",
+        500
+      )
+    );
+  }
+});
+
+const updateUserToken = async ({ id, token, expire }) => {
   const pool = await dbClient.getConnection(config.sql);
 
   const updateUserResetTokenQuery = `UPDATE [${config.sql.database}].[dbo].[${
     UsersTable.TABLE_NAME
   }]
               SET
-              ${UsersTable.COL_PASSWORD_RESET_EXPIRES} = '${new Date(
-    currentUser.getPasswordResetExpires()
-  ).toISOString()}' ,
-              ${
-                UsersTable.COL_PASSWORD_RESET_TOKEN
-              } = '${currentUser.getPasswordResetToken()}' 
-              WHERE _ID = ${currentUser.getId()}`;
+              ${UsersTable.COL_PASSWORD_RESET_EXPIRES} = ${
+    expire ? `'${expire}'` : null
+  } ,
+              ${UsersTable.COL_PASSWORD_RESET_TOKEN} = ${
+    token ? `'${token}'` : null
+  } 
+              WHERE _ID = ${id}`;
 
-  console.log(updateUserResetTokenQuery);
-  await pool.request().query(updateUserResetTokenQuery);
-});
+  return await pool.request().query(updateUserResetTokenQuery);
+};
 
 const resetPassword = (req, res, next) => {};
 module.exports = { onCreate, signup, login, forgotPassword, resetPassword };

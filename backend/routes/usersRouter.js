@@ -25,7 +25,7 @@ router.route("/me").get(protectRoutesMiddle.protect, usersController.getUser);
 router.post("/signup", checkUserBody, authController.onCreate);
 router.post("/login", authController.login);
 router.get("/forgotPassword", authController.forgotPassword);
-router.get("/resetPassword", authController.resetPassword);
+router.patch("/resetPassword/:token", authController.resetPassword);
 
 router.route("/").get(usersController.getUsers);
 
