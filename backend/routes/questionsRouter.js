@@ -5,8 +5,6 @@ const Question = require("../models/questionModel");
 const AppError = require("../utils/appError");
 const router = express.Router();
 
-router.route("/random").get(questionsController.getQuestionsWithDifficulity);
-
 const checkQuestionBody = (req, res, next) => {
   const errors = [];
   if (!req.body.question) errors.push("Please provide question!");
@@ -29,19 +27,40 @@ const checkQuestionBody = (req, res, next) => {
 };
 
 router
+  .route("/random")
+  .get(
+    protectRoutesMiddle.protect,
+    questionsController.getQuestionsWithDifficulity
+  );
+
+router
   .route("/")
   .get(protectRoutesMiddle.protect, questionsController.getQuestions)
   .post(
     protectRoutesMiddle.protect,
+    protectRoutesMiddle.restrictTo("admin"),
     checkQuestionBody,
     questionsController.onCreate
   );
 
 router
   .route("/:id")
-  .get(questionsController.getQuestion)
-  .put(checkQuestionBody, questionsController.onUpdate)
-  .delete(questionsController.onDelete);
+  .get(
+    protectRoutesMiddle.protect,
+    protectRoutesMiddle.restrictTo("admin"),
+    questionsController.getQuestion
+  )
+  .put(
+    protectRoutesMiddle.protect,
+    protectRoutesMiddle.restrictTo("admin"),
+    checkQuestionBody,
+    questionsController.onUpdate
+  )
+  .delete(
+    protectRoutesMiddle.protect,
+    protectRoutesMiddle.restrictTo("admin"),
+    questionsController.onDelete
+  );
 
 router.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

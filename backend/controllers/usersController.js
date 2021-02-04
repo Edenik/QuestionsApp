@@ -36,6 +36,8 @@ const getUsers = catchAsync(async (req, res, next) => {
 });
 
 const getUser = catchAsync(async (req, res, next) => {
+  console.log(req.params.id);
+
   const pool = await dbClient.getConnection(config.sql);
   const getUserQuery = `SELECT * 
             FROM [${config.sql.database}].[dbo].[${UsersTable.TABLE_NAME}]

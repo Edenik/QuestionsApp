@@ -84,5 +84,23 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
   req.user = currentUser;
+  req.params.id = currentUser.id;
   next();
 });
+
+exports.restrictTo = (role) => {
+  return (req, res, next) => {
+    if (role !== req.user.role) {
+      return next(
+        new AppError("You do not have premmission to perform this action", 403)
+      );
+    }
+    next();
+  };
+};
+
+exports.restrictToMe = (id) => {
+  return (req, res, next) => {
+    next();
+  };
+};

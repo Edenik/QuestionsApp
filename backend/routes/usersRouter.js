@@ -4,6 +4,7 @@ const authController = require("../controllers/authController");
 const User = require("../models/userModel");
 const router = express.Router();
 const AppError = require("../utils/appError");
+const protectRoutesMiddle = require("../middlewares/protectRoutesMiddle");
 
 const checkUserBody = (req, res, next) => {
   const errors = [];
@@ -20,6 +21,7 @@ const checkUserBody = (req, res, next) => {
   req.body.userOBJ.setId(req.params.id);
   next();
 };
+router.route("/me").get(protectRoutesMiddle.protect, usersController.getUser);
 
 router.post("/signup", checkUserBody, authController.onCreate);
 router.post("/login", authController.login);
@@ -30,7 +32,11 @@ router
   .route("/:id")
   .get(usersController.getUser)
   .put(checkUserBody, usersController.onUpdate)
-  .delete(usersController.onDelete);
+  .delete(
+    protectRoutesMiddle.protect,
+    protectRoutesMiddle.restrictTo("admin"),
+    usersController.onDelete
+  );
 
 router.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
