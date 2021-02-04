@@ -29,7 +29,6 @@ const getQuestion = catchAsync(async (req, res, next) => {
   if (question.recordsets[0].length == 0) {
     return next(new AppError("No question found with that id"));
   }
-  console.log(req);
   res.status(200).json({
     status: "success",
     user: req.user,

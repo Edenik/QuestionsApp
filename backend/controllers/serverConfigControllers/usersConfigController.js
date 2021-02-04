@@ -38,10 +38,12 @@ const createUsersTableWithData = async () => {
             (_ID INT PRIMARY KEY IDENTITY(1,1), 
             ${UsersTable.COL_EMAIL} VARCHAR(70) NOT NULL, 
             ${UsersTable.COL_USERNAME} VARCHAR(20) NOT NULL, 
-            ${UsersTable.COL_PASSWORD} VARCHAR(500) NOT NULL, 
+            ${UsersTable.COL_PASSWORD} VARCHAR(60) NOT NULL, 
             ${UsersTable.COL_ROLE} VARCHAR(5) NOT NULL, 
             ${UsersTable.COL_HIGHSCORE} INT NOT NULL,
-            ${UsersTable.COL_PASSWORD_CHANGED_AT} DATETIME NULL
+            ${UsersTable.COL_PASSWORD_CHANGED_AT} DATETIME NULL,
+            ${UsersTable.COL_PASSWORD_RESET_TOKEN} VARCHAR(70) NULL,
+            ${UsersTable.COL_PASSWORD_RESET_EXPIRES} DATETIME NULL
             )`;
     // UNIQUE KEY unique_email (${UsersTable.COL_EMAIL})
     // UNIQUE KEY( ${UsersTable.COL_EMAIL})

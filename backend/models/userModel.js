@@ -1,7 +1,16 @@
 const bcrypt = require("bcryptjs");
-
+const crypto = require("crypto");
 class User {
-  constructor(email, username, password, role = "user", id, passwordChangedAt) {
+  constructor(
+    email,
+    username,
+    password,
+    role = "user",
+    id,
+    passwordChangedAt,
+    passwordResetToken,
+    passwordResetExpires
+  ) {
     this.email = email;
     this.username = username;
     this.role = role;
@@ -9,6 +18,8 @@ class User {
     this.password = password;
     this.id = id;
     this.passwordChangedAt = passwordChangedAt;
+    this.passwordResetToken = passwordResetToken;
+    this.passwordResetExpires = passwordResetExpires;
   }
 
   getEmail() {
@@ -59,10 +70,6 @@ class User {
     this.id = id;
   }
 
-  async checkPassword(candidatePassword, userPassword) {
-    return await bcrypt.compare(candidatePassword, userPassword);
-  }
-
   getPasswordChangedAt() {
     return this.passwordChangedAt;
   }
@@ -70,6 +77,27 @@ class User {
   setPasswordChangedAt(date) {
     this.passwordChangedAt = date;
   }
+
+  getPasswordResetToken() {
+    return this.passwordResetToken;
+  }
+
+  setPasswordResetToken(token) {
+    this.passwordChangedAt = token;
+  }
+
+  getPasswordResetExpires() {
+    return this.passwordResetExpires;
+  }
+
+  setPasswordResetExpires(date) {
+    this.passwordResetExpires = date;
+  }
+
+  async checkPassword(candidatePassword, userPassword) {
+    return await bcrypt.compare(candidatePassword, userPassword);
+  }
+
   changedPasswordAfterLogin(JWTTimestamp) {
     if (this.passwordChangedAt) {
       const changedTimestamp = parseInt(
@@ -79,6 +107,19 @@ class User {
       return JWTTimestamp < changedTimestamp;
     }
     return false;
+  }
+
+  createPasswordResetToken() {
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    this.passwordResetToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+    console.log({ resetToken }, this.passwordResetToken);
+    this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+    return resetToken;
   }
 }
 
