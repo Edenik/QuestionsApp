@@ -15,6 +15,7 @@ const getUsers = catchAsync(async (req, res, next) => {
     ,[${UsersTable.COL_USERNAME}]
     ,[${UsersTable.COL_ROLE}]
     ,[${UsersTable.COL_HIGHSCORE}]
+    ,[${UsersTable.COL_PASSWORD_CHANGED_AT}]
            FROM [${config.sql.database}].[dbo].[${UsersTable.TABLE_NAME}]`;
   const users = await pool
     .request()

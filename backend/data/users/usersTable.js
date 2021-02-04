@@ -5,6 +5,7 @@ class UsersTable {
   static COL_PASSWORD = "password";
   static COL_ROLE = "role";
   static COL_HIGHSCORE = "highscore";
+  static COL_PASSWORD_CHANGED_AT = "passwordChangedAt";
 }
 
 module.exports = UsersTable;

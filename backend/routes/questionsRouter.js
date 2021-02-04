@@ -1,8 +1,8 @@
 const express = require("express");
 const questionsController = require("../controllers/questionsController");
+const protectRoutesMiddle = require("../middlewares/protectRoutesMiddle");
 const Question = require("../models/questionModel");
 const AppError = require("../utils/appError");
-
 const router = express.Router();
 
 router.route("/random").get(questionsController.getQuestionsWithDifficulity);
@@ -30,8 +30,12 @@ const checkQuestionBody = (req, res, next) => {
 
 router
   .route("/")
-  .get(questionsController.getQuestions)
-  .post(checkQuestionBody, questionsController.onCreate);
+  .get(protectRoutesMiddle.protect, questionsController.getQuestions)
+  .post(
+    protectRoutesMiddle.protect,
+    checkQuestionBody,
+    questionsController.onCreate
+  );
 
 router
   .route("/:id")

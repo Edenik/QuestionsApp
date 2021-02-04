@@ -1,13 +1,14 @@
 const bcrypt = require("bcryptjs");
 
 class User {
-  constructor(email, username, password, role = "user", id) {
+  constructor(email, username, password, role = "user", id, passwordChangedAt) {
     this.email = email;
     this.username = username;
     this.role = role;
     this.highscore = 0;
     this.password = password;
     this.id = id;
+    this.passwordChangedAt = passwordChangedAt;
   }
 
   getEmail() {
@@ -60,6 +61,24 @@ class User {
 
   async checkPassword(candidatePassword, userPassword) {
     return await bcrypt.compare(candidatePassword, userPassword);
+  }
+
+  getPasswordChangedAt() {
+    return this.passwordChangedAt;
+  }
+
+  setPasswordChangedAt(date) {
+    this.passwordChangedAt = date;
+  }
+  changedPasswordAfterLogin(JWTTimestamp) {
+    if (this.passwordChangedAt) {
+      const changedTimestamp = parseInt(
+        this.passwordChangedAt.getTime() / 1000,
+        10
+      );
+      return JWTTimestamp < changedTimestamp;
+    }
+    return false;
   }
 }
 

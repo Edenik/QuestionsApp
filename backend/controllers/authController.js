@@ -1,4 +1,4 @@
-const jsonwebtoken = require("jsonwebtoken");
+const jws = require("jsonwebtoken");
 const config = require("../config");
 const UsersTable = require("../data/users/usersTable");
 const User = require("../models/userModel");
@@ -8,7 +8,7 @@ const bcrypt = require("bcryptjs");
 const AppError = require("../utils/appError");
 
 const signToken = (id) => {
-  return jsonwebtoken.sign({ id }, config.jwtSecret, {
+  return jws.sign({ id }, config.jwtSecret, {
     expiresIn: "7d",
   });
 };
@@ -31,15 +31,18 @@ const signup = async ({ user, jwt }) => {
       [${UsersTable.COL_USERNAME}], 
        [${UsersTable.COL_PASSWORD}], 
        [${UsersTable.COL_ROLE}], 
-       [${UsersTable.COL_HIGHSCORE}])
+       [${UsersTable.COL_HIGHSCORE}],
+       [${UsersTable.COL_PASSWORD_CHANGED_AT}])
        VALUES( 
           @${UsersTable.COL_EMAIL} ,
           @${UsersTable.COL_USERNAME} ,
           @${UsersTable.COL_PASSWORD}, 
           @${UsersTable.COL_ROLE},
-          @${UsersTable.COL_HIGHSCORE}
+          @${UsersTable.COL_HIGHSCORE},
+          @${UsersTable.COL_PASSWORD_CHANGED_AT}
          ); SELECT SCOPE_IDENTITY() AS id;`;
 
+    console.log(newUserQuery);
     const pool = await dbClient.getConnection(config.sql);
     const newUser = await pool
       .request()
@@ -52,9 +55,14 @@ const signup = async ({ user, jwt }) => {
       )
       .input(UsersTable.COL_ROLE, dbClient.sql.Text, user.getRole())
       .input(UsersTable.COL_HIGHSCORE, dbClient.sql.Int, user.getHighscore())
+      .input(
+        UsersTable.COL_PASSWORD_CHANGED_AT,
+        dbClient.sql.DateTime,
+        user.getPasswordChangedAt()
+      )
       .output()
       .query(newUserQuery)
-      .catch(() => {
+      .catch((err) => {
         throw new AppError("Error with DB! (No data or connection error)");
       });
     let token;
@@ -75,11 +83,12 @@ const login = catchAsync(async (req, res, next) => {
   }
 
   const findUserByEmailQuery = `SELECT [_ID]
-  ,[email]
-  ,[username]
-  ,[password]
-  ,[role]
-  ,[highscore]
+  ,[${UsersTable.COL_EMAIL}]
+  ,[${UsersTable.COL_USERNAME}]
+  ,[${UsersTable.COL_PASSWORD}]
+  ,[${UsersTable.COL_ROLE}]
+  ,[${UsersTable.COL_HIGHSCORE}]
+  ,[${UsersTable.COL_PASSWORD_CHANGED_AT}]
 FROM [QuizApp].[dbo].[users] 
 WHERE email = '${email}'`;
   const pool = await dbClient.getConnection(config.sql);
@@ -87,26 +96,27 @@ WHERE email = '${email}'`;
   let userFromDb = await pool.request().query(findUserByEmailQuery);
   userFromDb = { ...userFromDb.recordsets[0][0] };
 
-  const user = new User(
+  const currentUser = new User(
     userFromDb.email,
     userFromDb.username,
     userFromDb.password,
-    userFromDb.role
+    userFromDb.role,
+    userFromDb._ID,
+    userFromDb.passwordChangedAt
   );
-  user.setId(userFromDb._ID);
 
   if (
     !userFromDb.email ||
     !userFromDb.password ||
-    !(await user.checkPassword(password, user.getPassword()))
+    !(await currentUser.checkPassword(password, currentUser.getPassword()))
   ) {
     next(new AppError("Incorrect email or password!", 401));
   }
 
-  const token = signToken(user.getId());
+  const token = signToken(currentUser.getId());
   res.status(200).json({
     status: "success",
-    user,
+    user: currentUser,
     token,
   });
 });

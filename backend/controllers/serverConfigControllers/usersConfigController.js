@@ -40,15 +40,15 @@ const createUsersTableWithData = async () => {
             ${UsersTable.COL_USERNAME} VARCHAR(20) NOT NULL, 
             ${UsersTable.COL_PASSWORD} VARCHAR(500) NOT NULL, 
             ${UsersTable.COL_ROLE} VARCHAR(5) NOT NULL, 
-            ${UsersTable.COL_HIGHSCORE} INT NOT NULL
-      
+            ${UsersTable.COL_HIGHSCORE} INT NOT NULL,
+            ${UsersTable.COL_PASSWORD_CHANGED_AT} DATETIME NULL
             )`;
     // UNIQUE KEY unique_email (${UsersTable.COL_EMAIL})
     // UNIQUE KEY( ${UsersTable.COL_EMAIL})
     await pool
       .request()
       .query(createTableQuery)
-      .catch(() => {
+      .catch((err) => {
         throw new AppError(
           `Table ${UsersTable.TABLE_NAME} already created!`,
           400
