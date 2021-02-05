@@ -22,9 +22,17 @@ const checkUserBody = (req, res, next) => {
   next();
 };
 router.route("/me").get(protectRoutesMiddle.protect, usersController.getUser);
+
+router
+  .route("/me/updatePassword")
+  .patch(protectRoutesMiddle.protect, authController.updatePassword);
+
 router.post("/signup", checkUserBody, authController.onCreate);
+
 router.post("/login", authController.login);
-router.get("/forgotPassword", authController.forgotPassword);
+
+router.patch("/forgotPassword", authController.forgotPassword);
+
 router.patch("/resetPassword/:token", authController.resetPassword);
 
 router.route("/").get(usersController.getUsers);

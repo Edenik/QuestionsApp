@@ -1,5 +1,8 @@
 const bcrypt = require("bcryptjs");
-const crypto = require("crypto");
+const cryptoRandomString = require("crypto-random-string");
+const cryptoJS = require("crypto-js");
+const config = require("../config");
+const jwt = require("jwt-simple");
 class User {
   constructor(
     email,
@@ -83,7 +86,7 @@ class User {
   }
 
   setPasswordResetToken(token) {
-    this.passwordChangedAt = token;
+    this.passwordResetToken = token;
   }
 
   getPasswordResetExpires() {
@@ -95,6 +98,7 @@ class User {
   }
 
   async checkPassword(candidatePassword, userPassword) {
+    console.log(await bcrypt.compare(candidatePassword, userPassword));
     return await bcrypt.compare(candidatePassword, userPassword);
   }
 
@@ -109,17 +113,25 @@ class User {
     return false;
   }
 
-  createPasswordResetToken() {
-    const resetToken = crypto.randomBytes(32).toString("hex");
+  async createPasswordResetToken() {
+    const payload = { id: this.id, email: this.email };
 
-    this.passwordResetToken = crypto
-      .createHash("sha256")
-      .update(resetToken)
-      .digest("hex");
-    console.log({ resetToken }, this.passwordResetToken);
+    // this.passwordResetToken = crypto
+    //   .createHash("sha256")
+    //   .update(resetToken)
+    //   .digest("hex");
+
+    this.passwordResetToken = jwt.encode(
+      payload,
+      config.jwtSecret,
+      false,
+      "HS256"
+    );
+    console.log(this.passwordResetToken);
+    console.log({ payload }, this.passwordResetToken);
     this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
 
-    return resetToken;
+    return this.passwordResetToken;
   }
 }
 

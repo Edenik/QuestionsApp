@@ -1,4 +1,5 @@
-const jws = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
+const jwtSimple = require("jwt-simple");
 const config = require("../config");
 const UsersTable = require("../data/users/usersTable");
 const User = require("../models/userModel");
@@ -9,10 +10,23 @@ const AppError = require("../utils/appError");
 const sendEmail = require("../utils/email");
 
 const signToken = (id) => {
-  return jws.sign({ id }, config.jwtSecret, {
+  return jwt.sign({ id }, config.jwtSecret, {
     expiresIn: "7d",
   });
 };
+
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user.id);
+
+  res.status(statusCode).json({
+    status: "success",
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
 const onCreate = catchAsync(async (req, res, next) => {
   const newUser = await signup({ user: req.body.userOBJ, jwt: true });
 
@@ -89,20 +103,24 @@ const signup = async ({ user, jwt }) => {
   }
 };
 
-const getUserByEmail = async (email, next) => {
+const getUserByCondition = async (key, value) => {
   try {
-    const findUserByEmailQuery = `SELECT [_ID]
+    const findUserByConditionQuery = `SELECT [_ID]
     ,[${UsersTable.COL_EMAIL}]
     ,[${UsersTable.COL_USERNAME}]
     ,[${UsersTable.COL_PASSWORD}]
     ,[${UsersTable.COL_ROLE}]
     ,[${UsersTable.COL_HIGHSCORE}]
     ,[${UsersTable.COL_PASSWORD_CHANGED_AT}]
+    ,[${UsersTable.COL_PASSWORD_RESET_TOKEN}]
+    ,[${UsersTable.COL_PASSWORD_RESET_EXPIRES}]
   FROM [QuizApp].[dbo].[users] 
-  WHERE email = '${email}'`;
+  WHERE ${key} = '${value}'`;
+
     const pool = await dbClient.getConnection(config.sql);
 
-    const userFromDb = await pool.request().query(findUserByEmailQuery);
+    const userFromDb = await pool.request().query(findUserByConditionQuery);
+
     if (!userFromDb.recordsets[0][0]) {
       throw new AppError("no user found", 400);
     }
@@ -119,7 +137,7 @@ const login = catchAsync(async (req, res, next) => {
     next(new AppError("Please provide email and password!", 400));
   }
 
-  userFromDb = await getUserByEmail(email);
+  userFromDb = await getUserByCondition(UsersTable.COL_EMAIL, email);
 
   const currentUser = new User(
     userFromDb.email,
@@ -138,20 +156,38 @@ const login = catchAsync(async (req, res, next) => {
     next(new AppError("Incorrect email or password!", 401));
   }
 
-  const token = signToken(currentUser.getId());
-  res.status(200).json({
-    status: "success",
-    user: currentUser,
-    token,
-  });
+  createSendToken(currentUser, 200, res);
 });
+
+const updateUserToken = async ({ id, token, expire }) => {
+  try {
+    const pool = await dbClient.getConnection(config.sql);
+
+    const updateUserResetTokenQuery = `UPDATE [${config.sql.database}].[dbo].[${
+      UsersTable.TABLE_NAME
+    }]
+              SET
+              ${UsersTable.COL_PASSWORD_RESET_EXPIRES} = ${
+      expire ? `'${expire}'` : null
+    } ,
+              ${UsersTable.COL_PASSWORD_RESET_TOKEN} = ${
+      token ? `'${token}'` : null
+    } 
+              WHERE _ID = ${id}`;
+
+    return await pool.request().query(updateUserResetTokenQuery);
+  } catch (error) {
+    console.log(error);
+    throw new AppError(`Could not update user's token!`);
+  }
+};
 
 const forgotPassword = catchAsync(async (req, res, next) => {
   if (!req.body || !req.body.email) {
     return next(new AppError("Please provide email to reset password!", 401));
   }
 
-  const user = await getUserByEmail(req.body.email);
+  const user = await getUserByCondition(UsersTable.COL_EMAIL, req.body.email);
 
   const currentUser = new User(
     user.email,
@@ -159,13 +195,15 @@ const forgotPassword = catchAsync(async (req, res, next) => {
     user.password,
     user.role,
     user._ID,
-    user.passwordChangedAt
+    user.passwordChangedAt,
+    user.passwordResetToken,
+    user.passwordResetExpires
   );
 
   if (!user) {
     return next(new AppError("There is no user with this email address!", 404));
   }
-  const resetToken = currentUser.createPasswordResetToken();
+  const resetToken = await currentUser.createPasswordResetToken();
 
   await updateUserToken({
     id: currentUser.id,
@@ -177,12 +215,17 @@ const forgotPassword = catchAsync(async (req, res, next) => {
     "host"
   )}/api/v1/users/resetPassword/${resetToken}`;
 
-  const message = `Forgot your password? Go to ${resetURL}. \nIf you didn't please ignore this email.`;
+  const message = `
+  <h1 style="font-size: 18px; font-weight: bold; margin-top: 20px">Forgot your password?</h1>
+  <p>Go to - ${resetURL} .</p>
+  <strong>If you didn't please ignore this email!</strong>
+ `;
 
   try {
     await sendEmail({
       email: req.body.email,
       subject: "Your password reset token - QuizApp",
+      resetToken,
       message,
     }).catch((err) => console.log(err));
     res.status(200).json({
@@ -201,23 +244,115 @@ const forgotPassword = catchAsync(async (req, res, next) => {
   }
 });
 
-const updateUserToken = async ({ id, token, expire }) => {
-  const pool = await dbClient.getConnection(config.sql);
+const resetPassword = catchAsync(async (req, res, next) => {
+  const payload = jwtSimple.decode(req.params.token, config.jwtSecret);
 
-  const updateUserResetTokenQuery = `UPDATE [${config.sql.database}].[dbo].[${
+  const user = await getUserByCondition(UsersTable.COL_EMAIL, payload.email);
+
+  const currentUser = new User(
+    user.email,
+    user.username,
+    user.password,
+    user.role,
+    user._ID,
+    user.passwordChangedAt,
+    user.passwordResetToken,
+    user.passwordResetExpires
+  );
+
+  const expirationTime = Date.parse(currentUser.getPasswordResetExpires());
+  const now = Date.now();
+  if (now > expirationTime) {
+    return next(new AppError("Token is invalid, or has expired.", 400));
+  }
+
+  const updateUserQuery = `UPDATE [${config.sql.database}].[dbo].[${
     UsersTable.TABLE_NAME
   }]
               SET
-              ${UsersTable.COL_PASSWORD_RESET_EXPIRES} = ${
-    expire ? `'${expire}'` : null
-  } ,
-              ${UsersTable.COL_PASSWORD_RESET_TOKEN} = ${
-    token ? `'${token}'` : null
-  } 
-              WHERE _ID = ${id}`;
+              ${UsersTable.COL_PASSWORD_RESET_TOKEN} = null ,
+              ${UsersTable.COL_PASSWORD_RESET_EXPIRES} = null ,
+              ${UsersTable.COL_PASSWORD} = '${await bcrypt.hash(
+    req.body.password,
+    12
+  )}' 
+              WHERE _ID = ${currentUser.getId()}`;
 
-  return await pool.request().query(updateUserResetTokenQuery);
+  const pool = await dbClient.getConnection(config.sql);
+
+  await pool.request().query(updateUserQuery);
+
+  createSendToken(currentUser, 200, res);
+});
+
+const updatePassword = catchAsync(async (req, res, next) => {
+  const userFromDb = await getUserByCondition("_ID", req.user.id);
+  const now = Date.now();
+  if (
+    !req.body ||
+    !req.body.email ||
+    !req.body.password ||
+    !req.body.newPassword
+  ) {
+    return next(
+      new AppError(
+        "To update user password you must send - Email, Current password & New Password",
+        401
+      )
+    );
+  }
+
+  const currentUser = new User(
+    userFromDb.email,
+    userFromDb.username,
+    userFromDb.password,
+    userFromDb.role,
+    userFromDb._ID,
+    userFromDb.passwordChangedAt
+  );
+
+  const passwordIsCorrect = await currentUser.checkPassword(
+    req.body.password,
+    currentUser.getPassword()
+  );
+
+  if (!passwordIsCorrect) {
+    return next(new AppError("Your current password is wrong", 401));
+  }
+
+  currentUser.setPasswordChangedAt(now);
+
+  const updateUserQuery = `UPDATE [${config.sql.database}].[dbo].[${
+    UsersTable.TABLE_NAME
+  }]
+              SET
+              ${
+                UsersTable.COL_PASSWORD_CHANGED_AT
+              } = '${new Date().toISOString()}' ,
+              ${UsersTable.COL_PASSWORD} = '${await bcrypt.hash(
+    req.body.newPassword,
+    12
+  )}' 
+              WHERE _ID = ${currentUser.getId()}`;
+  const pool = await dbClient.getConnection(config.sql);
+  await pool.request().query(updateUserQuery);
+
+  const token = signToken(currentUser.getId());
+
+  res.status(201).json({
+    status: "success",
+    token,
+    data: {
+      currentUser,
+    },
+  });
+});
+
+module.exports = {
+  onCreate,
+  signup,
+  login,
+  forgotPassword,
+  resetPassword,
+  updatePassword,
 };
-
-const resetPassword = (req, res, next) => {};
-module.exports = { onCreate, signup, login, forgotPassword, resetPassword };
