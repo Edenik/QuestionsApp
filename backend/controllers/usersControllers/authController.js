@@ -15,6 +15,54 @@ const signToken = (id) => {
   });
 };
 
+const getUserByCondition = async (key, value) => {
+  try {
+    const findUserByConditionQuery = `SELECT [_ID]
+    ,[${UsersTable.COL_EMAIL}]
+    ,[${UsersTable.COL_USERNAME}]
+    ,[${UsersTable.COL_PASSWORD}]
+    ,[${UsersTable.COL_ROLE}]
+    ,[${UsersTable.COL_HIGHSCORE}]
+    ,[${UsersTable.COL_PASSWORD_CHANGED_AT}]
+    ,[${UsersTable.COL_PASSWORD_RESET_TOKEN}]
+    ,[${UsersTable.COL_PASSWORD_RESET_EXPIRES}]
+  FROM [QuizApp].[dbo].[users] 
+  WHERE ${key} = '${value}'`;
+
+    const pool = await dbClient.getConnection(config.sql);
+
+    const userFromDb = await pool.request().query(findUserByConditionQuery);
+
+    if (!userFromDb.recordsets[0][0]) {
+      throw new AppError("no user found", 400);
+    }
+    return { ...userFromDb.recordsets[0][0] };
+  } catch (err) {
+    throw new AppError(err, 400);
+  }
+};
+
+const checkIfEmailExists = async (email) => {
+  try {
+    const findUserByConditionQuery = `SELECT [_ID]
+    ,[${UsersTable.COL_EMAIL}]
+  FROM [QuizApp].[dbo].[users] 
+  WHERE email = '${email}'`;
+
+    const pool = await dbClient.getConnection(config.sql);
+
+    let userFromDb = await pool.request().query(findUserByConditionQuery);
+    userFromDb = { ...userFromDb.recordsets[0][0] };
+    if (userFromDb.email) {
+      return true;
+    }
+
+    return false;
+  } catch (err) {
+    return false;
+  }
+};
+
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user.id);
 
@@ -27,7 +75,36 @@ const createSendToken = (user, statusCode, res) => {
   });
 };
 
+const updateUserToken = async ({ id, token, expire }) => {
+  try {
+    const pool = await dbClient.getConnection(config.sql);
+
+    const updateUserResetTokenQuery = `UPDATE [${config.sql.database}].[dbo].[${
+      UsersTable.TABLE_NAME
+    }]
+              SET
+              ${UsersTable.COL_PASSWORD_RESET_EXPIRES} = ${
+      expire ? `'${expire}'` : null
+    } ,
+              ${UsersTable.COL_PASSWORD_RESET_TOKEN} = ${
+      token ? `'${token}'` : null
+    } 
+              WHERE _ID = ${id}`;
+
+    return await pool.request().query(updateUserResetTokenQuery);
+  } catch (error) {
+    console.log(error);
+    throw new AppError(`Could not update user's token!`);
+  }
+};
+
 const onCreate = catchAsync(async (req, res, next) => {
+  const existsUserWithEmail = await checkIfEmailExists(req.body.userOBJ.email);
+
+  if (existsUserWithEmail) {
+    return next(new AppError("There is already user with this email!", 400));
+  }
+
   const newUser = await signup({ user: req.body.userOBJ, jwt: true });
 
   res.status(201).json({
@@ -100,34 +177,19 @@ const signup = async ({ user, jwt }) => {
     if (jwt === true) {
       token = signToken(newUser.recordsets[0][0].id);
     }
+
+    const message = `
+    <h1 style="font-size: 18px; font-weight: bold; margin-top: 20px">Welcome To Quiz App 😃⭐</h1>
+    <p>  <strong>It's good to see you here ${user.username}!</strong></p>
+   `;
+
+    await sendEmail({
+      email: user.email,
+      subject: "Welcome Back 😃⭐ - QuizApp",
+      message,
+    }).catch((err) => console.log(err));
+
     return { id: newUser.recordsets[0][0]["id"], token };
-  } catch (err) {
-    throw new AppError(err, 400);
-  }
-};
-
-const getUserByCondition = async (key, value) => {
-  try {
-    const findUserByConditionQuery = `SELECT [_ID]
-    ,[${UsersTable.COL_EMAIL}]
-    ,[${UsersTable.COL_USERNAME}]
-    ,[${UsersTable.COL_PASSWORD}]
-    ,[${UsersTable.COL_ROLE}]
-    ,[${UsersTable.COL_HIGHSCORE}]
-    ,[${UsersTable.COL_PASSWORD_CHANGED_AT}]
-    ,[${UsersTable.COL_PASSWORD_RESET_TOKEN}]
-    ,[${UsersTable.COL_PASSWORD_RESET_EXPIRES}]
-  FROM [QuizApp].[dbo].[users] 
-  WHERE ${key} = '${value}'`;
-
-    const pool = await dbClient.getConnection(config.sql);
-
-    const userFromDb = await pool.request().query(findUserByConditionQuery);
-
-    if (!userFromDb.recordsets[0][0]) {
-      throw new AppError("no user found", 400);
-    }
-    return { ...userFromDb.recordsets[0][0] };
   } catch (err) {
     throw new AppError(err, 400);
   }
@@ -161,29 +223,6 @@ const login = catchAsync(async (req, res, next) => {
 
   createSendToken(currentUser, 200, res);
 });
-
-const updateUserToken = async ({ id, token, expire }) => {
-  try {
-    const pool = await dbClient.getConnection(config.sql);
-
-    const updateUserResetTokenQuery = `UPDATE [${config.sql.database}].[dbo].[${
-      UsersTable.TABLE_NAME
-    }]
-              SET
-              ${UsersTable.COL_PASSWORD_RESET_EXPIRES} = ${
-      expire ? `'${expire}'` : null
-    } ,
-              ${UsersTable.COL_PASSWORD_RESET_TOKEN} = ${
-      token ? `'${token}'` : null
-    } 
-              WHERE _ID = ${id}`;
-
-    return await pool.request().query(updateUserResetTokenQuery);
-  } catch (error) {
-    console.log(error);
-    throw new AppError(`Could not update user's token!`);
-  }
-};
 
 const forgotPassword = catchAsync(async (req, res, next) => {
   if (!req.body || !req.body.email) {
