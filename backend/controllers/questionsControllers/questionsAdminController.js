@@ -1,15 +1,20 @@
 const config = require("../../config");
-const QuestionsTable = require("../../data/questions/questionsTable");
 const Question = require("../../models/questionModel");
+const QuestionsTable = require("../../data/questions/questionsTable");
+const {
+  selectAllFromQuestionsQuery,
+  selectQuestionWhereIdQuery,
+  newQuestionQuery,
+  updateQuestionQuery,
+  deleteQuestionQuery,
+} = require("../../data/questions/questionsQueries");
 const catchAsync = require("../../utils/catchAsync");
 const dbClient = require("../../utils/dbClient");
 const AppError = require("../../utils/appError");
 
 const getQuestions = catchAsync(async (req, res, next) => {
   const pool = await dbClient.getConnection(config.sql);
-  const getQuestionsQuery = `SELECT * 
-         FROM [${config.sql.database}].[dbo].[${QuestionsTable.TABLE_NAME}]`;
-  const questions = await pool.request().query(getQuestionsQuery);
+  const questions = await pool.request().query(selectAllFromQuestionsQuery);
   res.status(200).json({
     status: "success",
     data: {
@@ -20,15 +25,17 @@ const getQuestions = catchAsync(async (req, res, next) => {
 
 const getQuestion = catchAsync(async (req, res, next) => {
   const pool = await dbClient.getConnection(config.sql);
-  const getQuestionQuery = `SELECT * 
-            FROM [${config.sql.database}].[dbo].[${QuestionsTable.TABLE_NAME}]
-            WHERE _ID = ${req.params.id}`;
 
-  const question = await pool.request().query(getQuestionQuery);
+  const question = await pool
+    .request()
+    .query(selectQuestionWhereIdQuery(req.params.id));
 
   if (question.recordsets[0].length == 0) {
     return next(new AppError("No question found with that id"));
   }
+
+  delete req.user;
+
   res.status(200).json({
     status: "success",
     user: req.user,
@@ -39,7 +46,7 @@ const getQuestion = catchAsync(async (req, res, next) => {
 });
 
 const onCreate = catchAsync(async (req, res, next) => {
-  const newQuestionId = await createQuestion(req.body.questionOBJ);
+  const newQuestionId = await createQuestion(req.questionOBJ);
 
   if (newQuestionId.status === "error") {
     next(new AppError(newQuestionId.message));
@@ -55,22 +62,6 @@ const onCreate = catchAsync(async (req, res, next) => {
 
 const createQuestion = async (question) => {
   try {
-    const newQuestionQuery = `INSERT INTO [dbo].[${QuestionsTable.TABLE_NAME}]
-    ([${QuestionsTable.COL_QUESTION}], 
-       [${QuestionsTable.COL_OPTION1}], 
-       [${QuestionsTable.COL_OPTION2}], 
-       [${QuestionsTable.COL_OPTION3}], 
-       [${QuestionsTable.COL_DIFFICULITY}], 
-       [${QuestionsTable.COL_CORRECT_ANSWER}])  
-       VALUES ( 
-         @${QuestionsTable.COL_QUESTION} ,
-          @${QuestionsTable.COL_OPTION1}, 
-          @${QuestionsTable.COL_OPTION2},
-          @${QuestionsTable.COL_OPTION3},
-          @${QuestionsTable.COL_DIFFICULITY},
-          @${QuestionsTable.COL_CORRECT_ANSWER}
-         ); SELECT SCOPE_IDENTITY() AS id;`;
-
     const pool = await dbClient.getConnection(config.sql);
     const newQuestion = await pool
       .request()
@@ -119,7 +110,7 @@ const createQuestion = async (question) => {
 const onUpdate = catchAsync(async (req, res, next) => {
   const pool = await dbClient.getConnection(config.sql);
 
-  const questionOBJ = { ...req.body.questionOBJ };
+  const questionOBJ = { ...req.questionOBJ };
   const question = new Question(
     questionOBJ.question,
     questionOBJ.option1,
@@ -130,23 +121,7 @@ const onUpdate = catchAsync(async (req, res, next) => {
     questionOBJ.id
   );
 
-  const updateQuestionQuery = `UPDATE [${config.sql.database}].[dbo].[${
-    QuestionsTable.TABLE_NAME
-  }]
-              SET
-              ${QuestionsTable.COL_QUESTION} = '${question.getQuestion()}' ,
-              ${QuestionsTable.COL_OPTION1} = '${question.getOption1()}' ,
-              ${QuestionsTable.COL_OPTION2} = '${question.getOption2()}' ,
-              ${QuestionsTable.COL_OPTION3} = '${question.getOption3()}' ,
-              ${
-                QuestionsTable.COL_DIFFICULITY
-              } = '${question.getDifficulity()}' ,
-              ${
-                QuestionsTable.COL_CORRECT_ANSWER
-              } = '${question.getCorrectAnswer()}'
-              WHERE _ID = ${question.getId()}`;
-
-  await pool.request().query(updateQuestionQuery);
+  await pool.request().query(updateQuestionQuery(question));
 
   res.status(201).json({
     status: "success",
@@ -158,9 +133,10 @@ const onUpdate = catchAsync(async (req, res, next) => {
 
 const onDelete = catchAsync(async (req, res, next) => {
   const pool = await dbClient.getConnection(config.sql);
-  const deleteQuestionQuery = `DELETE FROM [${config.sql.database}].[dbo].[${QuestionsTable.TABLE_NAME}] 
-            WHERE _ID = ${req.params.id}`;
-  const deleteRes = await pool.request().query(deleteQuestionQuery);
+
+  const deleteRes = await pool
+    .request()
+    .query(deleteQuestionQuery(req.params.id));
 
   if (deleteRes.rowsAffected[0] == 0) {
     return next(new AppError("No question found to delete."));

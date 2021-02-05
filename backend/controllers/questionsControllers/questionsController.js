@@ -1,5 +1,8 @@
 const config = require("../../config");
-const QuestionsTable = require("../../data/questions/questionsTable");
+const {
+  checkAnswerQuery,
+  selectTop5QuestionsByDifficulityQuery,
+} = require("../../data/questions/questionsQueries");
 const catchAsync = require("../../utils/catchAsync");
 const dbClient = require("../../utils/dbClient");
 const AppError = require("../../utils/appError");
@@ -14,17 +17,10 @@ const getQuestionsWithDifficulity = catchAsync(async (req, res, next) => {
   }
 
   const pool = await dbClient.getConnection(config.sql);
+  const questions = await pool
+    .request()
+    .query(selectTop5QuestionsByDifficulityQuery(difficulity));
 
-  const getQuestionsQuery = `SELECT TOP 5 
-  [_ID]
-    ,[${QuestionsTable.COL_QUESTION}]
-    ,[${QuestionsTable.COL_OPTION1}]
-    ,[${QuestionsTable.COL_OPTION2}]
-    ,[${QuestionsTable.COL_OPTION3}]
-    ,[${QuestionsTable.COL_DIFFICULITY}]
-        FROM [${config.sql.database}].[dbo].[${QuestionsTable.TABLE_NAME}]
-        WHERE difficulity = '${difficulity}' ORDER BY NEWID()`;
-  const questions = await pool.request().query(getQuestionsQuery);
   if (questions.recordsets[0].length == 0) {
     return next(new AppError("No questions found."));
   }
@@ -46,17 +42,14 @@ const checkAnswer = catchAsync(async (req, res, next) => {
   }
 
   const pool = await dbClient.getConnection(config.sql);
-  const getQuestionQuery = `SELECT 
-  [_ID]
-  ,[correctAnswer]
-            FROM [${config.sql.database}].[dbo].[${QuestionsTable.TABLE_NAME}]
-            WHERE _ID = ${question} AND ${QuestionsTable.COL_CORRECT_ANSWER} = ${answer}`;
-
-  const questionFromDb = await pool.request().query(getQuestionQuery);
+  const questionFromDb = await pool
+    .request()
+    .query(checkAnswerQuery({ question, answer }));
 
   if (questionFromDb.recordsets[0].length == 0) {
     return next(new AppError("No question found or answer isn't correct."));
   }
+
   res.status(200).json({
     status: "success",
     data: "correct",

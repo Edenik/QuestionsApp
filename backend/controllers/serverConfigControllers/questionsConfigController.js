@@ -1,5 +1,9 @@
 const config = require("../../config");
 const QuestionsTable = require("../../data/questions/questionsTable");
+const {
+  createTableQuery,
+  removeTableQuery,
+} = require("../../data/questions/questionsQueries");
 const questionsController = require("../questionsControllers/questionsAdminController");
 const questionsData = require("../../data/questions/questionsData");
 const dbClient = require("../../utils/dbClient");
@@ -34,14 +38,6 @@ const onCreate = catchAsync(async (req, res, next) => {
 const createQuestionsTableWithData = async () => {
   try {
     const pool = await dbClient.getConnection(config.sql);
-    const createTableQuery = `CREATE TABLE ${QuestionsTable.TABLE_NAME} 
-            (_ID INT PRIMARY KEY IDENTITY(1,1), 
-            ${QuestionsTable.COL_QUESTION} VARCHAR(1000) NOT NULL, 
-            ${QuestionsTable.COL_OPTION1} VARCHAR(500) NOT NULL, 
-            ${QuestionsTable.COL_OPTION2} VARCHAR(500) NOT NULL, 
-            ${QuestionsTable.COL_OPTION3} VARCHAR(500) NOT NULL, 
-            ${QuestionsTable.COL_DIFFICULITY} VARCHAR(500) NOT NULL, 
-            ${QuestionsTable.COL_CORRECT_ANSWER} INT NOT NULL)`;
     await pool
       .request()
       .query(createTableQuery)
@@ -51,7 +47,9 @@ const createQuestionsTableWithData = async () => {
           400
         );
       });
+
     const questions = await addQuestionsToDb();
+
     return questions;
   } catch (err) {
     throw new AppError(err, 400);
@@ -87,11 +85,7 @@ const onDelete = catchAsync(async (req, res, next) => {
 const deleteQusetionsTable = async ({ force }) => {
   try {
     const pool = await dbClient.getConnection(config.sql);
-    const removeTableQuery = `DROP TABLE ${force === true ? "IF EXISTS" : ""} ${
-      QuestionsTable.TABLE_NAME
-    }`;
-
-    return await pool.request().query(removeTableQuery);
+    return await pool.request().query(removeTableQuery(force));
   } catch (err) {
     throw new AppError("Error with DB! (No data or connection error)", 400);
   }
