@@ -37,6 +37,33 @@ const getQuestionsWithDifficulity = catchAsync(async (req, res, next) => {
   });
 });
 
+const checkAnswer = catchAsync(async (req, res, next) => {
+  const question = req.query.question;
+  const answer = req.query.answer;
+
+  if (question == undefined || answer == undefined) {
+    return next(new AppError("You must enter question and answer number."));
+  }
+
+  const pool = await dbClient.getConnection(config.sql);
+  const getQuestionQuery = `SELECT 
+  [_ID]
+  ,[correctAnswer]
+            FROM [${config.sql.database}].[dbo].[${QuestionsTable.TABLE_NAME}]
+            WHERE _ID = ${question} AND ${QuestionsTable.COL_CORRECT_ANSWER} = ${answer}`;
+
+  const questionFromDb = await pool.request().query(getQuestionQuery);
+
+  if (questionFromDb.recordsets[0].length == 0) {
+    return next(new AppError("No question found or answer isn't correct."));
+  }
+  res.status(200).json({
+    status: "success",
+    data: "correct",
+  });
+});
+
 module.exports = {
   getQuestionsWithDifficulity,
+  checkAnswer,
 };

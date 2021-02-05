@@ -14,6 +14,10 @@ router
   );
 
 router
+  .route("/check")
+  .get(protectRoutesMiddle.protect, questionsController.checkAnswer);
+
+router
   .route("/")
   .get(
     protectRoutesMiddle.protect,
