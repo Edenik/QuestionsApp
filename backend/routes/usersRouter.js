@@ -41,6 +41,14 @@ router
   );
 
 router
+  .route("/stats")
+  .get(
+    protectRoutesMiddle.protect,
+    protectRoutesMiddle.restrictTo("admin"),
+    usersAdminController.getStats
+  );
+
+router
   .route("/:id")
   .get(
     protectRoutesMiddle.protect,

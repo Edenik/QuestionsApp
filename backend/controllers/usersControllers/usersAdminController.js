@@ -100,9 +100,30 @@ const onDelete = catchAsync(async (req, res, next) => {
   });
 });
 
+const getStats = catchAsync(async (req, res, next) => {
+  const pool = await dbClient.getConnection(config.sql);
+
+  const stats = await pool
+    .request()
+    .query(usersQueries.getUserHighScores)
+    .catch(() => {
+      next(new AppError("Error with DB! (No data or connection error)"));
+    });
+
+  console.log(stats.recordsets[0]);
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      stats: stats.recordsets[0],
+    },
+  });
+});
+
 module.exports = {
   getUsers,
   getUser,
   onUpdate,
   onDelete,
+  getStats,
 };

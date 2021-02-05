@@ -64,7 +64,7 @@ const checkIfEmailExists = async (email) => {
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user.id);
   res.cookie("jwt", token, getCookieOptions());
-
+  delete user.password;
   res.status(statusCode).json({
     status: "success",
     token,
@@ -197,7 +197,6 @@ const login = catchAsync(async (req, res, next) => {
   ) {
     next(new AppError("Incorrect email or password!", 401));
   }
-  currentUser.hidePassword();
 
   createSendToken(currentUser, 200, res);
 });
@@ -296,7 +295,6 @@ const resetPassword = catchAsync(async (req, res, next) => {
         currentUser.getId()
       )
     );
-  currentUser.hidePassword();
 
   createSendToken(currentUser, 200, res);
 });
@@ -350,7 +348,6 @@ const updatePassword = catchAsync(async (req, res, next) => {
 
   const token = signToken(currentUser.getId());
   res.cookie("jwt", token, getCookieOptions());
-  currentUser.hidePassword();
 
   res.status(201).json({
     status: "success",

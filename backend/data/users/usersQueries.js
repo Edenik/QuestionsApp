@@ -164,6 +164,15 @@ const activateUserQuery = (
                                   SET
                                   ${UsersTable.COL_ACTIVE} = '${activate}' 
                                   WHERE _ID = ${id}`;
+
+const getUserHighScores = `SELECT [_ID]
+,[${UsersTable.COL_EMAIL}]
+,[${UsersTable.COL_USERNAME}]
+,[${UsersTable.COL_ROLE}]
+,[${UsersTable.COL_HIGHSCORE}]
+FROM [QuizApp].[dbo].[users]
+ORDER BY ${UsersTable.COL_HIGHSCORE} DESC`;
+
 module.exports = {
   createTableQuery,
   removeTableQuery,
@@ -181,4 +190,5 @@ module.exports = {
   getUserDetailsWithOrWithoutPassword,
   updateUserEmailAndNameQuery,
   activateUserQuery,
+  getUserHighScores,
 };
