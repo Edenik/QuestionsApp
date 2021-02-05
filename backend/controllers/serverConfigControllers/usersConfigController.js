@@ -1,5 +1,9 @@
 const config = require("../../config");
 const UsersTable = require("../../data/users/usersTable");
+const {
+  createTableQuery,
+  removeTableQuery,
+} = require("../../data/users/usersQueries");
 const authController = require("../usersControllers/authController");
 const usersData = require("../../data/users/usersData");
 const dbClient = require("../../utils/dbClient");
@@ -34,20 +38,6 @@ const onCreate = catchAsync(async (req, res, next) => {
 const createUsersTableWithData = async () => {
   try {
     const pool = await dbClient.getConnection(config.sql);
-    const createTableQuery = `CREATE TABLE ${UsersTable.TABLE_NAME} 
-            (_ID INT PRIMARY KEY IDENTITY(1,1), 
-            ${UsersTable.COL_EMAIL} VARCHAR(70) NOT NULL, 
-            ${UsersTable.COL_USERNAME} VARCHAR(20) NOT NULL, 
-            ${UsersTable.COL_PASSWORD} VARCHAR(60) NOT NULL, 
-            ${UsersTable.COL_ROLE} VARCHAR(5) NOT NULL, 
-            ${UsersTable.COL_HIGHSCORE} INT NOT NULL,
-            ${UsersTable.COL_PASSWORD_CHANGED_AT} DATETIME NULL,
-            ${UsersTable.COL_PASSWORD_RESET_TOKEN} VARCHAR(150) NULL,
-            ${UsersTable.COL_PASSWORD_RESET_EXPIRES} DATETIME NULL,
-            ${UsersTable.COL_ACTIVE} TINYINT NOT NULL
-            )`;
-    // UNIQUE KEY unique_email (${UsersTable.COL_EMAIL})
-    // UNIQUE KEY( ${UsersTable.COL_EMAIL})
     await pool
       .request()
       .query(createTableQuery)
@@ -94,11 +84,8 @@ const onDelete = catchAsync(async (req, res, next) => {
 const deleteUsersTable = async ({ force }) => {
   try {
     const pool = await dbClient.getConnection(config.sql);
-    const removeTableQuery = `DROP TABLE ${force === true ? "IF EXISTS" : ""} ${
-      UsersTable.TABLE_NAME
-    }`;
 
-    return await pool.request().query(removeTableQuery);
+    return await pool.request().query(removeTableQuery(force));
   } catch (err) {
     throw new AppError("Error with DB! (No data or connection error)", 400);
   }

@@ -2,6 +2,12 @@ const jwt = require("jsonwebtoken");
 const jwtSimple = require("jwt-simple");
 const config = require("../../config");
 const UsersTable = require("../../data/users/usersTable");
+const {
+  findUserByConditionQuery,
+  checkIfEmailExistsQuery,
+  updateUserResetTokenQuery,
+  newUserQuery,
+} = require("../../data/users/usersQueries");
 const User = require("../../models/userModel");
 const catchAsync = require("../../utils/catchAsync");
 const dbClient = require("../../utils/dbClient");
@@ -28,21 +34,11 @@ const getCookieOptions = () => {
 
 const getUserByCondition = async (key, value) => {
   try {
-    const findUserByConditionQuery = `SELECT [_ID]
-    ,[${UsersTable.COL_EMAIL}]
-    ,[${UsersTable.COL_USERNAME}]
-    ,[${UsersTable.COL_PASSWORD}]
-    ,[${UsersTable.COL_ROLE}]
-    ,[${UsersTable.COL_HIGHSCORE}]
-    ,[${UsersTable.COL_PASSWORD_CHANGED_AT}]
-    ,[${UsersTable.COL_PASSWORD_RESET_TOKEN}]
-    ,[${UsersTable.COL_PASSWORD_RESET_EXPIRES}]
-  FROM [QuizApp].[dbo].[users] 
-  WHERE ${key} = '${value}'`;
-
     const pool = await dbClient.getConnection(config.sql);
 
-    const userFromDb = await pool.request().query(findUserByConditionQuery);
+    const userFromDb = await pool
+      .request()
+      .query(findUserByConditionQuery({ key, value }));
 
     if (!userFromDb.recordsets[0][0]) {
       throw new AppError("no user found", 400);
@@ -55,22 +51,16 @@ const getUserByCondition = async (key, value) => {
 
 const checkIfEmailExists = async (email) => {
   try {
-    const findUserByConditionQuery = `SELECT [_ID]
-    ,[${UsersTable.COL_EMAIL}]
-  FROM [QuizApp].[dbo].[users] 
-  WHERE email = '${email}'`;
-
     const pool = await dbClient.getConnection(config.sql);
 
-    let userFromDb = await pool.request().query(findUserByConditionQuery);
+    let userFromDb = await pool.request().query(checkIfEmailExistsQuery(email));
     userFromDb = { ...userFromDb.recordsets[0][0] };
     if (userFromDb.email) {
       return true;
     }
-
     return false;
   } catch (err) {
-    return false;
+    throw new AppError(err, 400);
   }
 };
 
@@ -90,20 +80,9 @@ const createSendToken = (user, statusCode, res) => {
 const updateUserToken = async ({ id, token, expire }) => {
   try {
     const pool = await dbClient.getConnection(config.sql);
-
-    const updateUserResetTokenQuery = `UPDATE [${config.sql.database}].[dbo].[${
-      UsersTable.TABLE_NAME
-    }]
-              SET
-              ${UsersTable.COL_PASSWORD_RESET_EXPIRES} = ${
-      expire ? `'${expire}'` : null
-    } ,
-              ${UsersTable.COL_PASSWORD_RESET_TOKEN} = ${
-      token ? `'${token}'` : null
-    } 
-              WHERE _ID = ${id}`;
-
-    return await pool.request().query(updateUserResetTokenQuery);
+    return await pool
+      .request()
+      .query(updateUserResetTokenQuery({ id, token, expire }));
   } catch (error) {
     console.log(error);
     throw new AppError(`Could not update user's token!`);
@@ -130,28 +109,6 @@ const onCreate = catchAsync(async (req, res, next) => {
 
 const signup = async ({ user, jwt }) => {
   try {
-    const newUserQuery = `INSERT INTO [dbo].[${UsersTable.TABLE_NAME}]
-    ([${UsersTable.COL_EMAIL}], 
-      [${UsersTable.COL_USERNAME}], 
-       [${UsersTable.COL_PASSWORD}], 
-       [${UsersTable.COL_ROLE}], 
-       [${UsersTable.COL_HIGHSCORE}],
-       [${UsersTable.COL_PASSWORD_CHANGED_AT}],
-       [${UsersTable.COL_PASSWORD_RESET_EXPIRES}],
-       [${UsersTable.COL_PASSWORD_RESET_TOKEN}],
-       [${UsersTable.COL_ACTIVE}])
-       VALUES( 
-          @${UsersTable.COL_EMAIL} ,
-          @${UsersTable.COL_USERNAME} ,
-          @${UsersTable.COL_PASSWORD}, 
-          @${UsersTable.COL_ROLE},
-          @${UsersTable.COL_HIGHSCORE},
-          @${UsersTable.COL_PASSWORD_CHANGED_AT},
-          @${UsersTable.COL_PASSWORD_RESET_EXPIRES},
-          @${UsersTable.COL_PASSWORD_RESET_TOKEN},
-          @${UsersTable.COL_ACTIVE}
-         ); SELECT SCOPE_IDENTITY() AS id;`;
-
     const pool = await dbClient.getConnection(config.sql);
     const newUser = await pool
       .request()
