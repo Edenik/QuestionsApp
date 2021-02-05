@@ -8,6 +8,7 @@ class UsersTable {
   static COL_PASSWORD_CHANGED_AT = "passwordChangedAt";
   static COL_PASSWORD_RESET_TOKEN = "passwordResetToken";
   static COL_PASSWORD_RESET_EXPIRES = "passwordResetExpires";
+  static COL_ACTIVE = "active";
 }
 
 module.exports = UsersTable;

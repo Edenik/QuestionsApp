@@ -1,6 +1,6 @@
 const config = require("../../config");
 const QuestionsTable = require("../../data/questions/questionsTable");
-const questionsController = require("../questionsController");
+const questionsController = require("../questionsControllers/questionsAdminController");
 const questionsData = require("../../data/questions/questionsData");
 const dbClient = require("../../utils/dbClient");
 const catchAsync = require("../../utils/catchAsync");

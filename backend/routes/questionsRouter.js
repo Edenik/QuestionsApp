@@ -1,5 +1,6 @@
 const express = require("express");
-const questionsController = require("../controllers/questionsController");
+const questionsController = require("../controllers/questionsControllers/questionsController");
+const questionsAdminController = require("../controllers/questionsControllers/questionsAdminController");
 const protectRoutesMiddle = require("../middlewares/protectRoutesMiddle");
 const Question = require("../models/questionModel");
 const AppError = require("../utils/appError");
@@ -35,12 +36,16 @@ router
 
 router
   .route("/")
-  .get(protectRoutesMiddle.protect, questionsController.getQuestions)
+  .get(
+    protectRoutesMiddle.protect,
+    protectRoutesMiddle.restrictTo("admin"),
+    questionsAdminController.getQuestions
+  )
   .post(
     protectRoutesMiddle.protect,
     protectRoutesMiddle.restrictTo("admin"),
     checkQuestionBody,
-    questionsController.onCreate
+    questionsAdminController.onCreate
   );
 
 router
@@ -48,18 +53,18 @@ router
   .get(
     protectRoutesMiddle.protect,
     protectRoutesMiddle.restrictTo("admin"),
-    questionsController.getQuestion
+    questionsAdminController.getQuestion
   )
   .put(
     protectRoutesMiddle.protect,
     protectRoutesMiddle.restrictTo("admin"),
     checkQuestionBody,
-    questionsController.onUpdate
+    questionsAdminController.onUpdate
   )
   .delete(
     protectRoutesMiddle.protect,
     protectRoutesMiddle.restrictTo("admin"),
-    questionsController.onDelete
+    questionsAdminController.onDelete
   );
 
 router.all("*", (req, res, next) => {

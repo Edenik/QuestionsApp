@@ -1,6 +1,4 @@
 const bcrypt = require("bcryptjs");
-const cryptoRandomString = require("crypto-random-string");
-const cryptoJS = require("crypto-js");
 const config = require("../config");
 const jwt = require("jwt-simple");
 class User {
@@ -12,7 +10,8 @@ class User {
     id,
     passwordChangedAt,
     passwordResetToken,
-    passwordResetExpires
+    passwordResetExpires,
+    active = 1
   ) {
     this.email = email;
     this.username = username;
@@ -23,6 +22,7 @@ class User {
     this.passwordChangedAt = passwordChangedAt;
     this.passwordResetToken = passwordResetToken;
     this.passwordResetExpires = passwordResetExpires;
+    this.active = active;
   }
 
   getEmail() {
@@ -95,6 +95,14 @@ class User {
 
   setPasswordResetExpires(date) {
     this.passwordResetExpires = date;
+  }
+
+  getActive() {
+    return this.active;
+  }
+
+  setActive(num) {
+    this.active = num > 1 ? 1 : num;
   }
 
   async checkPassword(candidatePassword, userPassword) {

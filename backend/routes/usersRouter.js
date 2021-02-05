@@ -1,6 +1,7 @@
 const express = require("express");
-const usersController = require("../controllers/usersController");
-const authController = require("../controllers/authController");
+const usersController = require("../controllers/usersControllers/usersController");
+const usersAdminController = require("../controllers/usersControllers/usersAdminController");
+const authController = require("../controllers/usersControllers/authController");
 const User = require("../models/userModel");
 const router = express.Router();
 const AppError = require("../utils/appError");
@@ -23,12 +24,20 @@ const checkUserBody = (req, res, next) => {
 };
 router
   .route("/me")
-  .get(protectRoutesMiddle.protect, usersController.getUser)
+  .get(protectRoutesMiddle.protect, usersController.getMe)
   .patch(protectRoutesMiddle.protect, usersController.updateMe);
 
 router
   .route("/me/updatePassword")
   .patch(protectRoutesMiddle.protect, authController.updatePassword);
+
+router
+  .route("/me/activate")
+  .patch(protectRoutesMiddle.protect, usersController.onActivateMe);
+
+router
+  .route("/me/delete")
+  .delete(protectRoutesMiddle.protect, usersController.onDeActivateMe);
 
 router.post("/signup", checkUserBody, authController.onCreate);
 
@@ -38,16 +47,31 @@ router.post("/forgotPassword", authController.forgotPassword);
 
 router.patch("/resetPassword/:token", authController.resetPassword);
 
-router.route("/").get(usersController.getUsers);
+router
+  .route("/")
+  .get(
+    protectRoutesMiddle.protect,
+    protectRoutesMiddle.restrictTo("admin"),
+    usersAdminController.getUsers
+  );
 
 router
   .route("/:id")
-  .get(usersController.getUser)
-  .put(checkUserBody, usersController.onUpdate)
+  .get(
+    protectRoutesMiddle.protect,
+    protectRoutesMiddle.restrictTo("admin"),
+    usersAdminController.getUser
+  )
+  .patch(
+    protectRoutesMiddle.protect,
+    protectRoutesMiddle.restrictTo("admin"),
+    checkUserBody,
+    usersAdminController.onUpdate
+  )
   .delete(
     protectRoutesMiddle.protect,
     protectRoutesMiddle.restrictTo("admin"),
-    usersController.onDelete
+    usersAdminController.onDelete
   );
 
 router.all("*", (req, res, next) => {

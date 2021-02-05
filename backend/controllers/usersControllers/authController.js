@@ -1,13 +1,13 @@
 const jwt = require("jsonwebtoken");
 const jwtSimple = require("jwt-simple");
-const config = require("../config");
-const UsersTable = require("../data/users/usersTable");
-const User = require("../models/userModel");
-const catchAsync = require("../utils/catchAsync");
-const dbClient = require("../utils/dbClient");
+const config = require("../../config");
+const UsersTable = require("../../data/users/usersTable");
+const User = require("../../models/userModel");
+const catchAsync = require("../../utils/catchAsync");
+const dbClient = require("../../utils/dbClient");
 const bcrypt = require("bcryptjs");
-const AppError = require("../utils/appError");
-const sendEmail = require("../utils/email");
+const AppError = require("../../utils/appError");
+const sendEmail = require("../../utils/email");
 
 const signToken = (id) => {
   return jwt.sign({ id }, config.jwtSecret, {
@@ -49,7 +49,8 @@ const signup = async ({ user, jwt }) => {
        [${UsersTable.COL_HIGHSCORE}],
        [${UsersTable.COL_PASSWORD_CHANGED_AT}],
        [${UsersTable.COL_PASSWORD_RESET_EXPIRES}],
-       [${UsersTable.COL_PASSWORD_RESET_TOKEN}])
+       [${UsersTable.COL_PASSWORD_RESET_TOKEN}],
+       [${UsersTable.COL_ACTIVE}])
        VALUES( 
           @${UsersTable.COL_EMAIL} ,
           @${UsersTable.COL_USERNAME} ,
@@ -58,7 +59,8 @@ const signup = async ({ user, jwt }) => {
           @${UsersTable.COL_HIGHSCORE},
           @${UsersTable.COL_PASSWORD_CHANGED_AT},
           @${UsersTable.COL_PASSWORD_RESET_EXPIRES},
-          @${UsersTable.COL_PASSWORD_RESET_TOKEN}
+          @${UsersTable.COL_PASSWORD_RESET_TOKEN},
+          @${UsersTable.COL_ACTIVE}
          ); SELECT SCOPE_IDENTITY() AS id;`;
 
     const pool = await dbClient.getConnection(config.sql);
@@ -88,6 +90,7 @@ const signup = async ({ user, jwt }) => {
         dbClient.sql.DateTime,
         user.getPasswordResetExpires()
       )
+      .input(UsersTable.COL_ACTIVE, dbClient.sql.TinyInt, user.getActive())
       .output()
       .query(newUserQuery)
       .catch((err) => {

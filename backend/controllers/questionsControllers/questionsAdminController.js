@@ -1,9 +1,9 @@
-const config = require("../config");
-const QuestionsTable = require("../data/questions/questionsTable");
-const Question = require("../models/questionModel");
-const catchAsync = require("../utils/catchAsync");
-const dbClient = require("../utils/dbClient");
-const AppError = require("../utils/appError");
+const config = require("../../config");
+const QuestionsTable = require("../../data/questions/questionsTable");
+const Question = require("../../models/questionModel");
+const catchAsync = require("../../utils/catchAsync");
+const dbClient = require("../../utils/dbClient");
+const AppError = require("../../utils/appError");
 
 const getQuestions = catchAsync(async (req, res, next) => {
   const pool = await dbClient.getConnection(config.sql);
@@ -34,26 +34,6 @@ const getQuestion = catchAsync(async (req, res, next) => {
     user: req.user,
     data: {
       question: question.recordsets[0],
-    },
-  });
-});
-
-const getQuestionsWithDifficulity = catchAsync(async (req, res, next) => {
-  const difficulity = "easy";
-  const pool = await dbClient.getConnection(config.sql);
-
-  const getQuestionsQuery = `SELECT TOP 5 *
-        FROM [${config.sql.database}].[dbo].[${QuestionsTable.TABLE_NAME}]
-        WHERE difficulity = '${difficulity}' ORDER BY NEWID()`;
-  const questions = await pool.request().query(getQuestionsQuery);
-  if (questions.recordsets[0].length == 0) {
-    return next(new AppError("No questions found."));
-  }
-
-  res.json({
-    status: "success",
-    data: {
-      questions: questions.recordsets[0],
     },
   });
 });
@@ -196,7 +176,6 @@ const onDelete = catchAsync(async (req, res, next) => {
 module.exports = {
   getQuestions,
   getQuestion,
-  getQuestionsWithDifficulity,
   createQuestion,
   onCreate,
   onUpdate,

@@ -1,6 +1,6 @@
 const config = require("../../config");
 const UsersTable = require("../../data/users/usersTable");
-const authController = require("../authController");
+const authController = require("../usersControllers/authController");
 const usersData = require("../../data/users/usersData");
 const dbClient = require("../../utils/dbClient");
 const catchAsync = require("../../utils/catchAsync");
@@ -43,7 +43,8 @@ const createUsersTableWithData = async () => {
             ${UsersTable.COL_HIGHSCORE} INT NOT NULL,
             ${UsersTable.COL_PASSWORD_CHANGED_AT} DATETIME NULL,
             ${UsersTable.COL_PASSWORD_RESET_TOKEN} VARCHAR(150) NULL,
-            ${UsersTable.COL_PASSWORD_RESET_EXPIRES} DATETIME NULL
+            ${UsersTable.COL_PASSWORD_RESET_EXPIRES} DATETIME NULL,
+            ${UsersTable.COL_ACTIVE} TINYINT NOT NULL
             )`;
     // UNIQUE KEY unique_email (${UsersTable.COL_EMAIL})
     // UNIQUE KEY( ${UsersTable.COL_EMAIL})
@@ -51,6 +52,7 @@ const createUsersTableWithData = async () => {
       .request()
       .query(createTableQuery)
       .catch((err) => {
+        console.log(err.message);
         throw new AppError(
           `Table ${UsersTable.TABLE_NAME} already created!`,
           400
