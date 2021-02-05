@@ -5,7 +5,14 @@ const dbClient = require("../../utils/dbClient");
 const AppError = require("../../utils/appError");
 
 const getQuestionsWithDifficulity = catchAsync(async (req, res, next) => {
-  const difficulity = "easy";
+  const difficulity = req.query.difficulity;
+
+  if (difficulity == undefined || !/(easy|medium|high)/.test(difficulity)) {
+    return next(
+      new AppError("Add difficulity as query: difficulity?=easy|medium|high")
+    );
+  }
+
   const pool = await dbClient.getConnection(config.sql);
 
   const getQuestionsQuery = `SELECT TOP 5 

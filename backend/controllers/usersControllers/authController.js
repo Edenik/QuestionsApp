@@ -8,6 +8,7 @@ const dbClient = require("../../utils/dbClient");
 const bcrypt = require("bcryptjs");
 const AppError = require("../../utils/appError");
 const sendEmail = require("../../utils/email");
+const filterObj = require("../../utils/filterObj");
 
 const signToken = (id) => {
   return jwt.sign({ id }, config.jwtSecret, {
@@ -99,13 +100,13 @@ const updateUserToken = async ({ id, token, expire }) => {
 };
 
 const onCreate = catchAsync(async (req, res, next) => {
-  const existsUserWithEmail = await checkIfEmailExists(req.body.userOBJ.email);
+  const existsUserWithEmail = await checkIfEmailExists(req.userOBJ.email);
 
   if (existsUserWithEmail) {
     return next(new AppError("There is already user with this email!", 400));
   }
 
-  const newUser = await signup({ user: req.body.userOBJ, jwt: true });
+  const newUser = await signup({ user: req.userOBJ, jwt: true });
 
   res.status(201).json({
     status: "success",
@@ -185,7 +186,7 @@ const signup = async ({ user, jwt }) => {
 
     await sendEmail({
       email: user.email,
-      subject: "Welcome Back 😃⭐ - QuizApp",
+      subject: "Welcome To - QuizApp 😃🎆⭐🎈",
       message,
     }).catch((err) => console.log(err));
 

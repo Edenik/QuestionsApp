@@ -9,19 +9,35 @@ const authController = require("./authController");
 const AppError = require("../../utils/appError");
 
 const getUsers = catchAsync(async (req, res, next) => {
-  // try {
+  const active = req.query.active;
+  if (active !== undefined && active > 1) {
+    return next(
+      new AppError(
+        "Try querying this route with: ?active=0 (unactive users) or ?active=1 (active users)"
+      )
+    );
+  }
   const pool = await dbClient.getConnection(config.sql);
   const getUsersQuery = `SELECT *
-           FROM [${config.sql.database}].[dbo].[${UsersTable.TABLE_NAME}]`;
+           FROM [${config.sql.database}].[dbo].[${UsersTable.TABLE_NAME}]
+           ${
+             active !== undefined
+               ? `WHERE ${UsersTable.COL_ACTIVE} = ${active}`
+               : ""
+           }
+           `;
+
+  console.log(getUsersQuery);
   const users = await pool
     .request()
     .query(getUsersQuery)
-    .catch(() => {
+    .catch((err) => {
+      console.log(err);
       next(new AppError("Error with DB! (No data or connection error)"));
     });
 
   if (users.recordsets[0].length == 0) {
-    next(new AppError("No users found on database"));
+    return next(new AppError("No users found"));
   }
   res.status(200).json({
     status: "success",

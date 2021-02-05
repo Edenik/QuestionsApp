@@ -45,8 +45,6 @@ const updateMe = catchAsync(async (req, res, next) => {
     );
   }
 
-  const filteredBody = filterObj(req.body, "username", "email");
-
   const currentUser = new User(
     filteredBody.email,
     filteredBody.username,
@@ -113,7 +111,7 @@ const onDeActivateMe = catchAsync(async (req, res, next) => {
     message,
   }).catch((err) => console.log(err));
 
-  res.status(200).json({
+  res.status(204).json({
     status: "success",
     data: null,
   });
