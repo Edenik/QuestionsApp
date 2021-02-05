@@ -15,7 +15,7 @@ class User {
   ) {
     this.email = email;
     this.username = username;
-    this.role = role;
+    this.role = !/(admin|user)/.test(role) ? "user" : role;
     this.highscore = 0;
     this.password = password;
     this.id = id;
@@ -54,7 +54,7 @@ class User {
   }
 
   setRole(role) {
-    this.role = role;
+    this.role = !/(admin|user)/.test(role) ? "user" : role;
   }
 
   getHighscore() {

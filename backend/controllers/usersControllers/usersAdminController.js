@@ -58,6 +58,9 @@ const onUpdate = catchAsync(async (req, res, next) => {
   const pool = await dbClient.getConnection(config.sql);
 
   const userOBJ = { ...req.body.userOBJ };
+
+  if (!/(admin|user)/.test(userOBJ.role)) userOBJ.role = "user";
+
   const user = new User(
     userOBJ.email,
     userOBJ.username,
