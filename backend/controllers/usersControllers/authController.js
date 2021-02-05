@@ -214,20 +214,42 @@ const login = catchAsync(async (req, res, next) => {
     next(new AppError("Please provide email and password!", 400));
   }
 
-  userFromDb = await getUserByCondition(UsersTable.COL_EMAIL, email);
+  const findUserByConditionQuery = `SELECT 
+  [_ID]
+    ,[${UsersTable.COL_EMAIL}]
+    ,[${UsersTable.COL_USERNAME}]
+    ,[${UsersTable.COL_PASSWORD}]
+    ,[${UsersTable.COL_ROLE}]
+    ,[${UsersTable.COL_HIGHSCORE}]
+    ,[${UsersTable.COL_PASSWORD_CHANGED_AT}]
+FROM [QuizApp].[dbo].[users] 
+WHERE email =@email`;
+
+  const pool = await dbClient.getConnection(config.sql);
+
+  let userFromDb = await pool
+    .request()
+    .input("email", dbClient.sql.VarChar, email)
+    .query(findUserByConditionQuery);
+
+  if (!userFromDb.recordsets[0][0]) {
+    throw new AppError("no user found", 400);
+  }
+
+  const user = userFromDb.recordsets[0][0];
 
   const currentUser = new User(
-    userFromDb.email,
-    userFromDb.username,
-    userFromDb.password,
-    userFromDb.role,
-    userFromDb._ID,
-    userFromDb.passwordChangedAt
+    user.email,
+    user.username,
+    user.password,
+    user.role,
+    user._ID,
+    user.passwordChangedAt
   );
 
   if (
-    !userFromDb.email ||
-    !userFromDb.password ||
+    !user.email ||
+    !user.password ||
     !(await currentUser.checkPassword(password, currentUser.getPassword()))
   ) {
     next(new AppError("Incorrect email or password!", 401));

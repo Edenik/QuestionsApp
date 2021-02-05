@@ -3,7 +3,6 @@ const UsersTable = require("../../data/users/usersTable");
 const User = require("../../models/userModel");
 const catchAsync = require("../../utils/catchAsync");
 const dbClient = require("../../utils/dbClient");
-const filterObj = require("../../utils/filterObj");
 const AppError = require("../../utils/appError");
 const sendEmail = require("../../utils/email");
 

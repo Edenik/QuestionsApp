@@ -3,6 +3,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
+const xss = require("xss-clean");
 
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
@@ -31,6 +32,8 @@ if (process.env.NODE_ENV === "development") {
 }
 
 app.use(express.json({ limit: "15kb" }));
+
+app.use(xss());
 
 app.use(cors());
 

@@ -1,3 +1,8 @@
+const filterObj = require("../utils/filterObj");
+
+const User = require("../models/userModel");
+const Question = require("../models/questionModel");
+
 const checkUserBody = (req, res, next) => {
   const filteredBody = filterObj(req.body, "username", "email", "password");
   const errors = [];
