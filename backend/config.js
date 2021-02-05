@@ -19,11 +19,13 @@ const {
   JWT_SECRET,
   EMAIL_USERNAME,
   EMAIL_PASSWORD,
+  NODE_ENV,
 } = process.env;
 
 module.exports = {
   port: PORT,
   jwtSecret: JWT_SECRET,
+  nodeEnvironment: NODE_ENV,
   sql: {
     user: SQL_USER,
     password: SQL_PASSWORD,

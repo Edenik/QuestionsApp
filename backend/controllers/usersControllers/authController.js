@@ -8,12 +8,22 @@ const dbClient = require("../../utils/dbClient");
 const bcrypt = require("bcryptjs");
 const AppError = require("../../utils/appError");
 const sendEmail = require("../../utils/email");
-const filterObj = require("../../utils/filterObj");
 
 const signToken = (id) => {
   return jwt.sign({ id }, config.jwtSecret, {
     expiresIn: "7d",
   });
+};
+
+const getCookieOptions = () => {
+  const cookieOptions = {
+    expires: new Date(Date.now() + 7 * 24 * 60 * 6 * 1000),
+    httpOnly: true,
+  };
+
+  if (config.nodeEnvironment === "production") cookieOptions.secure = true;
+
+  return cookieOptions;
 };
 
 const getUserByCondition = async (key, value) => {
@@ -66,6 +76,7 @@ const checkIfEmailExists = async (email) => {
 
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user.id);
+  res.cookie("jwt", token, getCookieOptions());
 
   res.status(statusCode).json({
     status: "success",
@@ -221,6 +232,7 @@ const login = catchAsync(async (req, res, next) => {
   ) {
     next(new AppError("Incorrect email or password!", 401));
   }
+  currentUser.hidePassword();
 
   createSendToken(currentUser, 200, res);
 });
@@ -324,6 +336,7 @@ const resetPassword = catchAsync(async (req, res, next) => {
   const pool = await dbClient.getConnection(config.sql);
 
   await pool.request().query(updateUserQuery);
+  currentUser.hidePassword();
 
   createSendToken(currentUser, 200, res);
 });
@@ -381,6 +394,8 @@ const updatePassword = catchAsync(async (req, res, next) => {
   await pool.request().query(updateUserQuery);
 
   const token = signToken(currentUser.getId());
+  res.cookie("jwt", token, getCookieOptions());
+  currentUser.hidePassword();
 
   res.status(201).json({
     status: "success",

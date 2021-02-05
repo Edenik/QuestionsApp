@@ -105,6 +105,10 @@ class User {
     this.active = num > 1 ? 1 : num;
   }
 
+  hidePassword() {
+    this.password = null;
+  }
+
   async checkPassword(candidatePassword, userPassword) {
     return await bcrypt.compare(candidatePassword, userPassword);
   }
