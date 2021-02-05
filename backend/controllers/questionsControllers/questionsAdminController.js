@@ -1,20 +1,16 @@
 const config = require("../../config");
 const Question = require("../../models/questionModel");
 const QuestionsTable = require("../../data/questions/questionsTable");
-const {
-  selectAllFromQuestionsQuery,
-  selectQuestionWhereIdQuery,
-  newQuestionQuery,
-  updateQuestionQuery,
-  deleteQuestionQuery,
-} = require("../../data/questions/questionsQueries");
+const questionsQueries = require("../../data/questions/questionsQueries");
 const catchAsync = require("../../utils/catchAsync");
 const dbClient = require("../../utils/dbClient");
 const AppError = require("../../utils/appError");
 
 const getQuestions = catchAsync(async (req, res, next) => {
   const pool = await dbClient.getConnection(config.sql);
-  const questions = await pool.request().query(selectAllFromQuestionsQuery);
+  const questions = await pool
+    .request()
+    .query(questionsQueries.selectAllFromQuestionsQuery);
   res.status(200).json({
     status: "success",
     data: {
@@ -28,7 +24,7 @@ const getQuestion = catchAsync(async (req, res, next) => {
 
   const question = await pool
     .request()
-    .query(selectQuestionWhereIdQuery(req.params.id));
+    .query(questionsQueries.selectQuestionWhereIdQuery(req.params.id));
 
   if (question.recordsets[0].length == 0) {
     return next(new AppError("No question found with that id"));
@@ -96,7 +92,7 @@ const createQuestion = async (question) => {
         question.getCorrectAnswer()
       )
       .output()
-      .query(newQuestionQuery)
+      .query(questionsQueries.newQuestionQuery)
       .catch((err) => {
         throw new Error("Error with DB! (No data or connection error)");
       });
@@ -121,7 +117,7 @@ const onUpdate = catchAsync(async (req, res, next) => {
     questionOBJ.id
   );
 
-  await pool.request().query(updateQuestionQuery(question));
+  await pool.request().query(questionsQueries.updateQuestionQuery(question));
 
   res.status(201).json({
     status: "success",
@@ -136,7 +132,7 @@ const onDelete = catchAsync(async (req, res, next) => {
 
   const deleteRes = await pool
     .request()
-    .query(deleteQuestionQuery(req.params.id));
+    .query(questionsQueries.deleteQuestionQuery(req.params.id));
 
   if (deleteRes.rowsAffected[0] == 0) {
     return next(new AppError("No question found to delete."));

@@ -1,9 +1,10 @@
+const bcrypt = require("bcryptjs");
 const config = require("../../config");
 const UsersTable = require("./usersTable");
 
 const createTableQuery = `CREATE TABLE ${UsersTable.TABLE_NAME} 
 (_ID INT PRIMARY KEY IDENTITY(1,1), 
-${UsersTable.COL_EMAIL} VARCHAR(70) NOT NULL, 
+${UsersTable.COL_EMAIL} VARCHAR(70) UNIQUE NOT NULL, 
 ${UsersTable.COL_USERNAME} VARCHAR(20) NOT NULL, 
 ${UsersTable.COL_PASSWORD} VARCHAR(60) NOT NULL, 
 ${UsersTable.COL_ROLE} VARCHAR(5) NOT NULL, 
@@ -67,10 +68,117 @@ const newUserQuery = `INSERT INTO [dbo].[${UsersTable.TABLE_NAME}]
                   @${UsersTable.COL_PASSWORD_RESET_TOKEN},
                   @${UsersTable.COL_ACTIVE}
                  ); SELECT SCOPE_IDENTITY() AS id;`;
+
+const getUserByEmailQuery = `SELECT 
+                 [_ID]
+                   ,[${UsersTable.COL_EMAIL}]
+                   ,[${UsersTable.COL_USERNAME}]
+                   ,[${UsersTable.COL_PASSWORD}]
+                   ,[${UsersTable.COL_ROLE}]
+                   ,[${UsersTable.COL_HIGHSCORE}]
+                   ,[${UsersTable.COL_PASSWORD_CHANGED_AT}]
+               FROM [QuizApp].[dbo].[users] 
+               WHERE email =@email`;
+
+const resetUserPasswordQuery = async (password, id) => `UPDATE [${
+  config.sql.database
+}].[dbo].[${UsersTable.TABLE_NAME}]
+            SET
+            ${UsersTable.COL_PASSWORD_RESET_TOKEN} = null ,
+            ${UsersTable.COL_PASSWORD_RESET_EXPIRES} = null ,
+            ${UsersTable.COL_PASSWORD} = '${await bcrypt.hash(password, 12)}' 
+            WHERE _ID = ${id};`;
+
+const updatePasswordQuery = async (password, id) => `UPDATE [${
+  config.sql.database
+}].[dbo].[${UsersTable.TABLE_NAME}]
+                        SET
+                        ${
+                          UsersTable.COL_PASSWORD_CHANGED_AT
+                        } = '${new Date().toISOString()}' ,
+                        ${UsersTable.COL_PASSWORD} = '${await bcrypt.hash(
+  password,
+  12
+)}' 
+                        WHERE _ID = ${id}`;
+const getActiveDeactiveUsers = (active) => `SELECT *
+FROM [${config.sql.database}].[dbo].[${UsersTable.TABLE_NAME}]
+${active !== undefined ? `WHERE ${UsersTable.COL_ACTIVE} = ${active}` : ""}
+`;
+
+const getAllDataFromUser = (id) => `SELECT * 
+FROM [${config.sql.database}].[dbo].[${UsersTable.TABLE_NAME}]
+WHERE _ID = ${id}`;
+
+const updateFullUserQuery = async (user) => `UPDATE [${
+  config.sql.database
+}].[dbo].[${UsersTable.TABLE_NAME}]
+            SET
+            ${UsersTable.COL_EMAIL} = '${user.getEmail()}' ,
+            ${UsersTable.COL_USERNAME} = '${user.getUsername()}' ,
+            ${
+              UsersTable.COL_PASSWORD_CHANGED_AT
+            } = '${new Date().toISOString()}' ,
+            ${UsersTable.COL_PASSWORD} = '${await bcrypt.hash(
+  user.getPassword(),
+  12
+)}' ,
+            ${UsersTable.COL_ROLE} = '${user.getRole()}' ,
+            ${UsersTable.COL_HIGHSCORE} = '${user.getHighscore()}' 
+            WHERE _ID = ${user.getId()}`;
+
+const deleteUserQuery = (
+  id
+) => `DELETE FROM [${config.sql.database}].[dbo].[${UsersTable.TABLE_NAME}] 
+            WHERE _ID = ${id}`;
+
+const getUserDetailsWithOrWithoutPassword = (getPassword, id) => `SELECT 
+            [_ID]
+                ,[${UsersTable.COL_EMAIL}]
+                ,[${UsersTable.COL_USERNAME}]
+                ,[${UsersTable.COL_ROLE}]
+                ,[${UsersTable.COL_HIGHSCORE}]
+                ,[${UsersTable.COL_ACTIVE}]
+                ${getPassword === true ? `,[${UsersTable.COL_PASSWORD}]` : ``}
+                      FROM [${config.sql.database}].[dbo].[${
+  UsersTable.TABLE_NAME
+}]
+                      WHERE _ID = ${id}`;
+
+const updateUserEmailAndNameQuery = (user) => `UPDATE [${
+  config.sql.database
+}].[dbo].[${UsersTable.TABLE_NAME}]
+                                  SET
+                                  ${
+                                    UsersTable.COL_EMAIL
+                                  } = '${user.getEmail()}' ,
+                                  ${
+                                    UsersTable.COL_USERNAME
+                                  } = '${user.getUsername()}' 
+                                  WHERE _ID = ${user.getId()}`;
+
+const activateUserQuery = (
+  activate,
+  id
+) => `UPDATE [${config.sql.database}].[dbo].[${UsersTable.TABLE_NAME}]
+                                  SET
+                                  ${UsersTable.COL_ACTIVE} = '${activate}' 
+                                  WHERE _ID = ${id}`;
 module.exports = {
   createTableQuery,
   removeTableQuery,
   findUserByConditionQuery,
+  checkIfEmailExistsQuery,
   updateUserResetTokenQuery,
   newUserQuery,
+  getUserByEmailQuery,
+  resetUserPasswordQuery,
+  updatePasswordQuery,
+  getActiveDeactiveUsers,
+  getAllDataFromUser,
+  updateFullUserQuery,
+  deleteUserQuery,
+  getUserDetailsWithOrWithoutPassword,
+  updateUserEmailAndNameQuery,
+  activateUserQuery,
 };

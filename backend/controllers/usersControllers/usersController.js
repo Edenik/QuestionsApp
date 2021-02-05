@@ -1,28 +1,20 @@
 const config = require("../../config");
 const UsersTable = require("../../data/users/usersTable");
+const usersQueries = require("../../data/users/usersQueries");
 const User = require("../../models/userModel");
 const catchAsync = require("../../utils/catchAsync");
 const dbClient = require("../../utils/dbClient");
 const AppError = require("../../utils/appError");
 const sendEmail = require("../../utils/email");
+const filterObj = require("../../utils/filterObj");
 
 const getCurrentUser = async ({ id, getPassword, next }) => {
   try {
     const pool = await dbClient.getConnection(config.sql);
-    const getUserQuery = `SELECT 
-  [_ID]
-      ,[${UsersTable.COL_EMAIL}]
-      ,[${UsersTable.COL_USERNAME}]
-      ,[${UsersTable.COL_ROLE}]
-      ,[${UsersTable.COL_HIGHSCORE}]
-      ,[${UsersTable.COL_ACTIVE}]
-      ${getPassword === true ? `,[${UsersTable.COL_PASSWORD}]` : ``}
-            FROM [${config.sql.database}].[dbo].[${UsersTable.TABLE_NAME}]
-            WHERE _ID = ${id}`;
 
     const currentUser = await pool
       .request()
-      .query(getUserQuery)
+      .query(usersQueries.getUserDetailsWithOrWithoutPassword(getPassword, id))
       .catch(() => {
         next(new AppError("Error with DB! (No data or connection error)"));
       });
@@ -43,6 +35,7 @@ const updateMe = catchAsync(async (req, res, next) => {
       new AppError("To update user you must include email and username!", 400)
     );
   }
+  const filteredBody = filterObj(req.body, "username", "email");
 
   const currentUser = new User(
     filteredBody.email,
@@ -53,16 +46,10 @@ const updateMe = catchAsync(async (req, res, next) => {
     req.user.id
   );
 
-  const updateUserQuery = `UPDATE [${config.sql.database}].[dbo].[${
-    UsersTable.TABLE_NAME
-  }]
-              SET
-              ${UsersTable.COL_EMAIL} = '${currentUser.getEmail()}' ,
-              ${UsersTable.COL_USERNAME} = '${currentUser.getUsername()}' 
-              WHERE _ID = ${req.user.id}`;
   const pool = await dbClient.getConnection(config.sql);
-
-  await pool.request().query(updateUserQuery);
+  await pool
+    .request()
+    .query(usersQueries.updateUserEmailAndNameQuery(currentUser));
 
   res.status(201).json({
     status: "success",
@@ -118,13 +105,11 @@ const onDeActivateMe = catchAsync(async (req, res, next) => {
 
 const activate = async ({ id, activate, next }) => {
   try {
-    const updateUserQuery = `UPDATE [${config.sql.database}].[dbo].[${UsersTable.TABLE_NAME}]
-    SET
-    ${UsersTable.COL_ACTIVE} = '${activate}' 
-    WHERE _ID = ${id}`;
     const pool = await dbClient.getConnection(config.sql);
 
-    return await pool.request().query(updateUserQuery);
+    return await pool
+      .request()
+      .query(usersQueries.activateUserQuery(activate, id));
   } catch (err) {
     return next(new AppError("Error updating activate / delete user", 400));
   }

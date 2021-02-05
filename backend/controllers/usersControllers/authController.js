@@ -1,17 +1,12 @@
 const jwt = require("jsonwebtoken");
 const jwtSimple = require("jwt-simple");
+const bcrypt = require("bcryptjs");
 const config = require("../../config");
 const UsersTable = require("../../data/users/usersTable");
-const {
-  findUserByConditionQuery,
-  checkIfEmailExistsQuery,
-  updateUserResetTokenQuery,
-  newUserQuery,
-} = require("../../data/users/usersQueries");
+const usersQueries = require("../../data/users/usersQueries");
 const User = require("../../models/userModel");
 const catchAsync = require("../../utils/catchAsync");
 const dbClient = require("../../utils/dbClient");
-const bcrypt = require("bcryptjs");
 const AppError = require("../../utils/appError");
 const sendEmail = require("../../utils/email");
 
@@ -38,7 +33,7 @@ const getUserByCondition = async (key, value) => {
 
     const userFromDb = await pool
       .request()
-      .query(findUserByConditionQuery({ key, value }));
+      .query(usersQueries.findUserByConditionQuery({ key, value }));
 
     if (!userFromDb.recordsets[0][0]) {
       throw new AppError("no user found", 400);
@@ -53,7 +48,9 @@ const checkIfEmailExists = async (email) => {
   try {
     const pool = await dbClient.getConnection(config.sql);
 
-    let userFromDb = await pool.request().query(checkIfEmailExistsQuery(email));
+    let userFromDb = await pool
+      .request()
+      .query(usersQueries.checkIfEmailExistsQuery(email));
     userFromDb = { ...userFromDb.recordsets[0][0] };
     if (userFromDb.email) {
       return true;
@@ -82,7 +79,7 @@ const updateUserToken = async ({ id, token, expire }) => {
     const pool = await dbClient.getConnection(config.sql);
     return await pool
       .request()
-      .query(updateUserResetTokenQuery({ id, token, expire }));
+      .query(usersQueries.updateUserResetTokenQuery({ id, token, expire }));
   } catch (error) {
     console.log(error);
     throw new AppError(`Could not update user's token!`);
@@ -138,7 +135,7 @@ const signup = async ({ user, jwt }) => {
       )
       .input(UsersTable.COL_ACTIVE, dbClient.sql.TinyInt, user.getActive())
       .output()
-      .query(newUserQuery)
+      .query(usersQueries.newUserQuery)
       .catch((err) => {
         throw new AppError("Error with DB! (No data or connection error)");
       });
@@ -171,23 +168,12 @@ const login = catchAsync(async (req, res, next) => {
     next(new AppError("Please provide email and password!", 400));
   }
 
-  const findUserByConditionQuery = `SELECT 
-  [_ID]
-    ,[${UsersTable.COL_EMAIL}]
-    ,[${UsersTable.COL_USERNAME}]
-    ,[${UsersTable.COL_PASSWORD}]
-    ,[${UsersTable.COL_ROLE}]
-    ,[${UsersTable.COL_HIGHSCORE}]
-    ,[${UsersTable.COL_PASSWORD_CHANGED_AT}]
-FROM [QuizApp].[dbo].[users] 
-WHERE email =@email`;
-
   const pool = await dbClient.getConnection(config.sql);
 
   let userFromDb = await pool
     .request()
     .input("email", dbClient.sql.VarChar, email)
-    .query(findUserByConditionQuery);
+    .query(usersQueries.getUserByEmailQuery);
 
   if (!userFromDb.recordsets[0][0]) {
     throw new AppError("no user found", 400);
@@ -300,21 +286,16 @@ const resetPassword = catchAsync(async (req, res, next) => {
     return next(new AppError("Token is invalid, or has expired.", 400));
   }
 
-  const updateUserQuery = `UPDATE [${config.sql.database}].[dbo].[${
-    UsersTable.TABLE_NAME
-  }]
-              SET
-              ${UsersTable.COL_PASSWORD_RESET_TOKEN} = null ,
-              ${UsersTable.COL_PASSWORD_RESET_EXPIRES} = null ,
-              ${UsersTable.COL_PASSWORD} = '${await bcrypt.hash(
-    req.body.password,
-    12
-  )}' 
-              WHERE _ID = ${currentUser.getId()}`;
-
   const pool = await dbClient.getConnection(config.sql);
 
-  await pool.request().query(updateUserQuery);
+  await pool
+    .request()
+    .query(
+      usersQueries.resetUserPasswordQuery(
+        req.body.password,
+        currentUser.getId()
+      )
+    );
   currentUser.hidePassword();
 
   createSendToken(currentUser, 200, res);
@@ -357,20 +338,15 @@ const updatePassword = catchAsync(async (req, res, next) => {
 
   currentUser.setPasswordChangedAt(now);
 
-  const updateUserQuery = `UPDATE [${config.sql.database}].[dbo].[${
-    UsersTable.TABLE_NAME
-  }]
-              SET
-              ${
-                UsersTable.COL_PASSWORD_CHANGED_AT
-              } = '${new Date().toISOString()}' ,
-              ${UsersTable.COL_PASSWORD} = '${await bcrypt.hash(
-    req.body.newPassword,
-    12
-  )}' 
-              WHERE _ID = ${currentUser.getId()}`;
   const pool = await dbClient.getConnection(config.sql);
-  await pool.request().query(updateUserQuery);
+  await pool
+    .request()
+    .query(
+      usersQueries.updatePasswordQuery(
+        req.body.newPassword,
+        currentUser.getId()
+      )
+    );
 
   const token = signToken(currentUser.getId());
   res.cookie("jwt", token, getCookieOptions());
