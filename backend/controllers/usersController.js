@@ -3,6 +3,7 @@ const UsersTable = require("../data/users/usersTable");
 const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
 const dbClient = require("../utils/dbClient");
+const filterObj = require("../utils/filterObj");
 const bcrypt = require("bcryptjs");
 const authController = require("./authController");
 const AppError = require("../utils/appError");
@@ -77,6 +78,9 @@ const onUpdate = catchAsync(async (req, res, next) => {
               SET
               ${UsersTable.COL_EMAIL} = '${user.getEmail()}' ,
               ${UsersTable.COL_USERNAME} = '${user.getUsername()}' ,
+              ${
+                UsersTable.COL_PASSWORD_CHANGED_AT
+              } = '${new Date().toISOString()}' ,
               ${UsersTable.COL_PASSWORD} = '${await bcrypt.hash(
     user.getPassword(),
     12
@@ -117,9 +121,51 @@ const onDelete = catchAsync(async (req, res, next) => {
   });
 });
 
+const updateMe = catchAsync(async (req, res, next) => {
+  if (req.body.password || req.body.newPassword) {
+    return next(new AppError("This route is not for password updates!", 400));
+  }
+
+  if (!req.body.username || !req.body.email) {
+    return next(
+      new AppError("To update user you must include email and username!", 400)
+    );
+  }
+
+  const filteredBody = filterObj(req.body, "username", "email");
+
+  const currentUser = new User(
+    filteredBody.email,
+    filteredBody.username,
+    req.user.password,
+    req.user.role,
+    req.user.highscore,
+    req.user.id
+  );
+
+  const updateUserQuery = `UPDATE [${config.sql.database}].[dbo].[${
+    UsersTable.TABLE_NAME
+  }]
+              SET
+              ${UsersTable.COL_EMAIL} = '${currentUser.getEmail()}' ,
+              ${UsersTable.COL_USERNAME} = '${currentUser.getUsername()}' 
+              WHERE _ID = ${req.user.id}`;
+  const pool = await dbClient.getConnection(config.sql);
+
+  await pool.request().query(updateUserQuery);
+
+  res.status(201).json({
+    status: "success",
+    data: {
+      user: currentUser,
+    },
+  });
+});
+
 module.exports = {
   getUsers,
   getUser,
   onUpdate,
   onDelete,
+  updateMe,
 };

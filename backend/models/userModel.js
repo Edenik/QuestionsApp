@@ -98,7 +98,6 @@ class User {
   }
 
   async checkPassword(candidatePassword, userPassword) {
-    console.log(await bcrypt.compare(candidatePassword, userPassword));
     return await bcrypt.compare(candidatePassword, userPassword);
   }
 
@@ -116,19 +115,12 @@ class User {
   async createPasswordResetToken() {
     const payload = { id: this.id, email: this.email };
 
-    // this.passwordResetToken = crypto
-    //   .createHash("sha256")
-    //   .update(resetToken)
-    //   .digest("hex");
-
     this.passwordResetToken = jwt.encode(
       payload,
       config.jwtSecret,
       false,
       "HS256"
     );
-    console.log(this.passwordResetToken);
-    console.log({ payload }, this.passwordResetToken);
     this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
 
     return this.passwordResetToken;
