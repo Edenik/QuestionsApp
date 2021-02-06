@@ -10,16 +10,23 @@ import { Router } from '@angular/router';
 export class QuestionsService {
   constructor(private http: HttpClient, private router: Router) {}
   private questions: Question[] = [];
-  private questionsUpdated = new Subject<Question[]>();
+  private questionsUpdated = new Subject<{
+    questions: Question[];
+    total: number;
+  }>();
 
-  getQuestions() {
+  getQuestions(postsPerPage: number, currentPage: number) {
+    const queryParams = `?pagesize=${postsPerPage}&page=${currentPage}`;
     this.http
-      .get<{ status: string; data: { questions: Question[] } }>(
-        `${environment.apiUrl}/questions`
+      .get<{ status: string; total: number; data: { questions: Question[] } }>(
+        `${environment.apiUrl}/questions/${queryParams}`
       )
       .subscribe((questionsData) => {
         this.questions = [...questionsData.data.questions];
-        this.questionsUpdated.next([...this.questions]);
+        this.questionsUpdated.next({
+          questions: [...this.questions],
+          total: questionsData.total,
+        });
       });
   }
 
@@ -56,10 +63,6 @@ export class QuestionsService {
         questionOBJ
       )
       .subscribe((responseData) => {
-        const questionId = responseData.data.newQuestionId;
-        questionOBJ.id = questionId;
-        this.questions.push(questionOBJ);
-        this.questionsUpdated.next([...this.questions]);
         this.router.navigate(['/']);
       });
   }
@@ -86,24 +89,11 @@ export class QuestionsService {
     this.http
       .put(`${environment.apiUrl}/questions/${id}`, questionOBJ)
       .subscribe(() => {
-        const updatedQuestions = [...this.questions];
-        const oldQuestionId = updatedQuestions.findIndex(
-          (q) => q.id === questionOBJ.id
-        );
-        updatedQuestions[oldQuestionId] = questionOBJ;
-        this.questions = updatedQuestions;
-        this.questionsUpdated.next([...this.questions]);
         this.router.navigate(['/']);
       });
   }
 
   deleteQuestion(questionId: number) {
-    this.http
-      .delete(`${environment.apiUrl}/questions/${questionId}`)
-      .subscribe(() => {
-        const updatedPost = this.questions.filter((q) => q.id !== questionId);
-        this.questions = updatedPost;
-        this.questionsUpdated.next([...this.questions]);
-      });
+    return this.http.delete(`${environment.apiUrl}/questions/${questionId}`);
   }
 }

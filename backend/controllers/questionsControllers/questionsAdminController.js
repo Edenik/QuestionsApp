@@ -7,12 +7,28 @@ const dbClient = require("../../utils/dbClient");
 const AppError = require("../../utils/appError");
 
 const getQuestions = catchAsync(async (req, res, next) => {
+  const pageSize = req.query.pagesize;
+  const currentPage = req.query.page;
+  let query = questionsQueries.selectAllFromQuestionsQuery;
+  console.log(req.query);
+  if (pageSize && currentPage) {
+    const skip = pageSize * (currentPage - 1);
+    const limit = pageSize;
+    query = questionsQueries.selectAllFromQuestionsPaginatingQuery({
+      skip,
+      limit,
+    });
+  }
+
   const pool = await dbClient.getConnection(config.sql);
-  const questions = await pool
+  const questions = await pool.request().query(query);
+  const questionsLength = await pool
     .request()
-    .query(questionsQueries.selectAllFromQuestionsQuery);
+    .query(questionsQueries.countQuestionsQuery);
+
   res.status(200).json({
     status: "success",
+    total: questionsLength.recordsets[0][0][""],
     data: {
       questions: questions.recordsets[0],
     },

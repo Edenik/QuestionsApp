@@ -11,6 +11,24 @@ const selectAllFromQuestionsQuery = `SELECT [${QuestionsTable.COL_QUESTION}],
 FROM [${config.sql.database}].[dbo].[${QuestionsTable.TABLE_NAME}]
 `;
 
+const selectAllFromQuestionsPaginatingQuery = ({
+  skip,
+  limit,
+}) => `SELECT [${QuestionsTable.COL_QUESTION}], 
+[${QuestionsTable.COL_OPTION1}], 
+[${QuestionsTable.COL_OPTION2}], 
+[${QuestionsTable.COL_OPTION3}], 
+[${QuestionsTable.COL_DIFFICULITY}], 
+[${QuestionsTable.COL_CORRECT_ANSWER}]  ,
+[_ID] AS id
+FROM [${config.sql.database}].[dbo].[${QuestionsTable.TABLE_NAME}]
+ORDER BY [_ID] ASC
+OFFSET ${skip} ROWS FETCH NEXT ${limit} ROWS ONLY
+`;
+
+const countQuestionsQuery = `SELECT COUNT (*)
+FROM [${config.sql.database}].[dbo].[${QuestionsTable.TABLE_NAME}]`;
+
 const selectQuestionWhereIdQuery = (id) => `SELECT * 
 FROM [${config.sql.database}].[dbo].[${QuestionsTable.TABLE_NAME}]
 WHERE _ID = ${id}`;
@@ -83,6 +101,7 @@ const removeTableQuery = (force) =>
   }`;
 module.exports = {
   selectAllFromQuestionsQuery,
+  selectAllFromQuestionsPaginatingQuery,
   selectQuestionWhereIdQuery,
   newQuestionQuery,
   updateQuestionQuery,
@@ -91,4 +110,5 @@ module.exports = {
   selectTop5QuestionsByDifficulityQuery,
   createTableQuery,
   removeTableQuery,
+  countQuestionsQuery,
 };

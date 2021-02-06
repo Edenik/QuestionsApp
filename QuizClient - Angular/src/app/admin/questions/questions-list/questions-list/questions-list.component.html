@@ -20,4 +20,7 @@
   </mat-expansion-panel>
 </mat-accordion>
 
+<mat-paginator [length]="totalQuestions" [pageSize]="questionsPerPage" [pageSizeOptions]="pageSizeOptions"
+  (page)="onChangedPage($event)" *ngIf="questions.length > 0"></mat-paginator>
+
 <p class="info-text center-text mat-body-1" *ngIf="questions.length <= 0 && !isLoading">No questions added yet!</p>
