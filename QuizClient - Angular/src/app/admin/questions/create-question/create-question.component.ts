@@ -15,6 +15,7 @@ export class CreateQuestionComponent implements OnInit {
   private mode: Mode = Mode.create;
   private questionId: number = null;
   questionOBJ: Question;
+  isLoading: boolean = false;
 
   constructor(
     public questionsService: QuestionsService,
@@ -24,6 +25,7 @@ export class CreateQuestionComponent implements OnInit {
   onSaveQuestion(form: NgForm) {
     if (form.invalid) return;
 
+    this.isLoading = true;
     if (this.mode === Mode.create) {
       this.questionsService.addQuestion(
         form.value.question,
@@ -52,10 +54,12 @@ export class CreateQuestionComponent implements OnInit {
       if (paramMap.has('id')) {
         this.mode = Mode.edit;
         this.questionId = parseInt(paramMap.get('id'));
+        this.isLoading = true;
         this.questionsService
           .getQuestion(this.questionId)
           .subscribe((questionData) => {
-            console.log(questionData);
+            this.isLoading = false;
+            // console.log(questionData);
             const {
               id,
               question,

@@ -10,6 +10,7 @@ import { QuestionsService } from 'src/app/core/services/questions.service';
 })
 export class QuestionsListComponent implements OnInit, OnDestroy {
   questions: Question[] = [];
+  isLoading: boolean = false;
   private questionsSub: Subscription = new Subscription();
 
   constructor(public questionsService: QuestionsService) {}
@@ -19,10 +20,12 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.isLoading = true;
     this.questionsService.getQuestions();
     this.questionsSub = this.questionsService
       .getQuestionUpdateListener()
       .subscribe((questions: Question[]) => {
+        this.isLoading = false;
         this.questions = questions;
       });
   }

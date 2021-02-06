@@ -1,5 +1,6 @@
 <mat-card>
-  <form (submit)="onSaveQuestion(questionForm)" #questionForm="ngForm">
+  <mat-spinner *ngIf="isLoading"></mat-spinner>
+  <form (submit)="onSaveQuestion(questionForm)" #questionForm="ngForm" *ngIf="!isLoading">
     <mat-form-field>
       <textarea matInput rows="2" type="text" [ngModel]="questionOBJ?.question" name="question" #question="ngModel"
         placeholder="Question" required minlength="20" maxlength="150"></textarea>
