@@ -1,3 +1,42 @@
-<textarea rows="6"></textarea>
-<hr>
-<button>click</button>
+<mat-card>
+  <form (submit)="onAddQuestion(questionForm)" #questionForm="ngForm">
+    <mat-form-field>
+      <textarea matInput rows="2" type="text" ngModel name="question" #question="ngModel" placeholder="Question"
+        required minlength="20" maxlength="150"></textarea>
+      <mat-error *ngIf="question.invalid">Please enter a question. (Min 20 chars, Max 150 chars)</mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput type="text" ngModel name="option1" #option1="ngModel" placeholder="Option 1" required
+        minlength="5" maxlength="100">
+      <mat-error *ngIf="option1.invalid">Please enter option 1 text. (Min 5 chars, Max 100 chars)</mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput type="text" ngModel name="option2" #option2="ngModel" placeholder="Option 2" required
+        minlength="5" maxlength="100">
+      <mat-error *ngIf="option2.invalid">Please enter option 2 text. (Min 5 chars, Max 100 chars)</mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput type="text" ngModel name="option3" #option3="ngModel" placeholder="Option 3" required
+        minlength="5" maxlength="100">
+      <mat-error *ngIf="option3.invalid">Please enter option 3 text. (Min 5 chars, Max 100 chars)</mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput type="text" ngModel name="correctAnswer" #correctAnswer="ngModel" placeholder="Correct answer"
+        required minlength="1" maxlength="1">
+      <mat-error *ngIf="correctAnswer.invalid">Please enter the number of the correct answer. (1-3)</mat-error>
+    </mat-form-field>
+
+
+    <mat-form-field>
+      <input matInput type="text" ngModel name="difficulity" #difficulity="ngModel" placeholder="Difficulity" required
+        maxlength="6">
+      <mat-error *ngIf="difficulity.invalid">Please enter difficulity. (easy,medium,hard)</mat-error>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" type="submit">Save Question</button>
+  </form>
+</mat-card>

@@ -7,15 +7,6 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AppComponent implements OnInit {
   title = 'QuizClient';
-  showConfetti: boolean = false;
-  ngOnInit() {
-    setInterval(() => {
-      this.showConfetti = true;
-      console.log(this.showConfetti);
-      setTimeout(() => {
-        this.showConfetti = false;
-        console.log(this.showConfetti);
-      }, 4000);
-    }, 10000);
-  }
+
+  ngOnInit() {}
 }

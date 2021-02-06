@@ -1,0 +1,21 @@
+<mat-accordion multi="false" *ngIf="questions.length > 0">
+  <mat-expansion-panel *ngFor="let question of questions">
+
+    <mat-expansion-panel-header>
+      {{question.question}}
+    </mat-expansion-panel-header>
+
+    <p>1) {{question.option1}}</p>
+    <p>2) {{question.option2}}</p>
+    <p>3) {{question.option3}}</p>
+    <p>Correct Answer: {{question.correctAnswer}}</p>
+
+    <mat-action-row>
+      <button mat-raised-button color="primary">Edit</button>
+      <button mat-raised-button color="warn">Delete</button>
+    </mat-action-row>
+
+  </mat-expansion-panel>
+</mat-accordion>
+
+<p class="info-text center-text mat-body-1" *ngIf="questions.length <= 0">No questions added yet!</p>

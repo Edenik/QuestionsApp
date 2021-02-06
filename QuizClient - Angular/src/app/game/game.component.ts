@@ -10,9 +10,11 @@ export class GameComponent implements OnInit {
   ngOnInit() {
     // setInterval(() => {
     //   this.showConfetti = true;
+    //   console.log('this.showConfetti = true;');
     //   setTimeout(() => {
     //     this.showConfetti = false;
-    //   }, 1000);
-    // }, 3000);
+    //     console.log('this.showConfetti = false;');
+    //   }, 5500);
+    // }, 10000);
   }
 }

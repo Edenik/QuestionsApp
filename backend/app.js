@@ -17,6 +17,7 @@ const usersRouter = require("./routes/usersRouter");
 const app = express();
 
 // Middlewares
+app.use(cors());
 
 app.use(helmet());
 
@@ -37,8 +38,6 @@ app.use(express.json({ limit: "15kb" }));
 app.use(xss());
 
 app.use(hpp());
-
-app.use(cors());
 
 // Routes
 app.use("/api/v1/serverConfig", serverConfigRouter);
