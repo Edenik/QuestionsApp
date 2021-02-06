@@ -1,0 +1,14 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+body {
+  background: url("https://edenik.com/assets/images/quiz_app_background.png")
+    no-repeat center center;
+  background-size: cover;
+  display: grid;
+  font-family: "Raleway", monospace;
+  font-weight: 500;
+  min-height: 100vh;
+  place-items: center;
+}
