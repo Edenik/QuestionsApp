@@ -14,6 +14,10 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
 
   constructor(public questionsService: QuestionsService) {}
 
+  onDelete(questionId: number) {
+    this.questionsService.deleteQuestion(questionId);
+  }
+
   ngOnInit(): void {
     this.questionsService.getQuestions();
     this.questionsSub = this.questionsService

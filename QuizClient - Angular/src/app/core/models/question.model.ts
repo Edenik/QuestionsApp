@@ -1,9 +1,3 @@
-enum Difficulity {
-  easy,
-  medium,
-  hard,
-}
-
 export interface Question {
   id?: number;
   question: string;

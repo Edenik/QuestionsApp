@@ -1,8 +1,15 @@
 const config = require("../../config");
 const QuestionsTable = require("./questionsTable");
 
-const selectAllFromQuestionsQuery = `SELECT * 
-FROM [${config.sql.database}].[dbo].[${QuestionsTable.TABLE_NAME}]`;
+const selectAllFromQuestionsQuery = `SELECT [${QuestionsTable.COL_QUESTION}], 
+[${QuestionsTable.COL_OPTION1}], 
+[${QuestionsTable.COL_OPTION2}], 
+[${QuestionsTable.COL_OPTION3}], 
+[${QuestionsTable.COL_DIFFICULITY}], 
+[${QuestionsTable.COL_CORRECT_ANSWER}]  ,
+[_ID] AS id
+FROM [${config.sql.database}].[dbo].[${QuestionsTable.TABLE_NAME}]
+`;
 
 const selectQuestionWhereIdQuery = (id) => `SELECT * 
 FROM [${config.sql.database}].[dbo].[${QuestionsTable.TABLE_NAME}]
@@ -46,13 +53,13 @@ const deleteQuestionQuery = (
                   WHERE _ID = ${id}`;
 
 const checkAnswerQuery = ({ question, answer }) => `SELECT 
-                  [_ID]
+                  [_ID] AS id
                   ,[correctAnswer]
                             FROM [${config.sql.database}].[dbo].[${QuestionsTable.TABLE_NAME}]
                             WHERE _ID = ${question} AND ${QuestionsTable.COL_CORRECT_ANSWER} = ${answer}`;
 
 const selectTop5QuestionsByDifficulityQuery = (difficulity) => `SELECT TOP 5 
-[_ID]
+[_ID] AS id
   ,[${QuestionsTable.COL_QUESTION}]
   ,[${QuestionsTable.COL_OPTION1}]
   ,[${QuestionsTable.COL_OPTION2}]

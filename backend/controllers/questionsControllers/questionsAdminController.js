@@ -107,7 +107,7 @@ const onUpdate = catchAsync(async (req, res, next) => {
   const pool = await dbClient.getConnection(config.sql);
 
   const questionOBJ = { ...req.questionOBJ };
-  const question = new Question(
+  const newQuestion = new Question(
     questionOBJ.question,
     questionOBJ.option1,
     questionOBJ.option2,
@@ -117,12 +117,12 @@ const onUpdate = catchAsync(async (req, res, next) => {
     questionOBJ.id
   );
 
-  await pool.request().query(questionsQueries.updateQuestionQuery(question));
+  await pool.request().query(questionsQueries.updateQuestionQuery(newQuestion));
 
   res.status(201).json({
     status: "success",
     data: {
-      questionOBJ,
+      qustion: newQuestion,
     },
   });
 });
