@@ -1,3 +1,13 @@
+#game-container {
+  place-items: center;
+  display: grid;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
 .holder {
   position: relative;
   &:before,
@@ -8,7 +18,7 @@
     content: "";
     height: 180px;
     width: 180px;
-    margin: 0 auto;
+    margin: 0;
     position: absolute;
     top: 50%;
     -ms-transform: translateY(-50%);
@@ -56,6 +66,11 @@
     margin-top: 100px;
     position: relative;
     z-index: 2;
+  }
+  svg {
+    bottom: 30px;
+    position: absolute;
+    right: 30px;
   }
 }
 @keyframes orbit {

@@ -3,16 +3,16 @@
   <span class="spacer"></span>
   <ul>
     <li *ngIf="userIsAuthenticated && role === 'admin'">
-      <a mat-button routerLink="/questions" routerLinkActive="mat-warn">Questions</a>
+      <a mat-button routerLink="/admin/questions" routerLinkActive="mat-warn">Questions</a>
     </li>
     <li *ngIf="userIsAuthenticated && role === 'admin'">
-      <a mat-button routerLink="/create" routerLinkActive="mat-warn">New Question</a>
+      <a mat-button routerLink="/admin/create" routerLinkActive="mat-warn">New Question</a>
     </li>
     <li *ngIf="!userIsAuthenticated">
-      <a mat-button routerLink="/login" routerLinkActive="mat-warn">Login</a>
+      <a mat-button routerLink="/auth/login" routerLinkActive="mat-warn">Login</a>
     </li>
     <li *ngIf="!userIsAuthenticated">
-      <a mat-button routerLink="/signup" routerLinkActive="mat-warn">Signup</a>
+      <a mat-button routerLink="/auth/signup" routerLinkActive="mat-warn">Signup</a>
     </li>
 
     <li *ngIf="userIsAuthenticated">
