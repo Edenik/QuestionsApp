@@ -3,6 +3,9 @@
   <span class="spacer"></span>
   <ul>
     <li *ngIf="userIsAuthenticated">
+      <a mat-button routerLink="/questions" routerLinkActive="mat-warn">Questions</a>
+    </li>
+    <li *ngIf="userIsAuthenticated">
       <a mat-button routerLink="/create" routerLinkActive="mat-warn">New Question</a>
     </li>
     <li *ngIf="!userIsAuthenticated">
