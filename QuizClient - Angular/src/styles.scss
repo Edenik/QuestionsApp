@@ -69,7 +69,7 @@ $custom-typography: mat-typography-config(
   $body-1: mat-typography-level(16px, 24px, 500),
 );
 
-@include angular-material-theme($quiz-red-theme);
+@include angular-material-theme($quiz-blue-theme);
 @include mat-core($custom-typography);
 
 main {

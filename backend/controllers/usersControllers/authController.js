@@ -12,13 +12,13 @@ const sendEmail = require("../../utils/email");
 
 const signToken = (id) => {
   return jwt.sign({ id }, config.jwtSecret, {
-    expiresIn: "7d",
+    expiresIn: "1d",
   });
 };
 
 const getCookieOptions = () => {
   const cookieOptions = {
-    expires: new Date(Date.now() + 7 * 24 * 60 * 6 * 1000),
+    expires: new Date(Date.now() + 60 * 60 * 24),
     httpOnly: true,
   };
 
@@ -70,6 +70,7 @@ const createSendToken = (user, statusCode, res) => {
     token,
     data: {
       user,
+      expiresIn: 60 * 60 * 24,
     },
   });
 };
@@ -155,7 +156,11 @@ const signup = async ({ user, jwt }) => {
       message,
     }).catch((err) => console.log(err));
 
-    return { id: newUser.recordsets[0][0]["id"], token };
+    return {
+      id: newUser.recordsets[0][0]["id"],
+      token,
+      expiresIn: 60 * 60 * 24,
+    };
   } catch (err) {
     throw new AppError(err, 400);
   }
@@ -187,7 +192,7 @@ const login = catchAsync(async (req, res, next) => {
     user.password,
     user.role,
     user._ID,
-    user.passwordChangedAt
+    user.highscore
   );
 
   if (
