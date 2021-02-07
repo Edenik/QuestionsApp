@@ -1,0 +1,17 @@
+<app-game *ngIf="userIsAuthenticated"></app-game>
+
+<div id="home-container" *ngIf="!userIsAuthenticated">
+  <div class="holder">
+    <div class="card">
+      <div class="card-body">
+        <span class="card-title">Quiz App</span>
+
+        <span class="card-text">Hello</span>
+        <span class="card-text">Hello</span>
+        <span class="card-text">Hello</span>
+        <span class="card-text">Hello</span>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AuthGuard } from './core/guards/auth.guard';
-import { AuthAdminGuard } from './core/guards/authAdmin.guard';
-import { GameComponent } from './game/game.component';
-import { HomeComponent } from './home/home.component';
+import { AuthGuard } from './modules/auth/auth.guard';
+import { AuthAdminGuard } from './modules/admin/authAdmin.guard';
+import { GameComponent } from './modules/home/game/board/game.component';
+import { HomeComponent } from './modules/home/home.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -11,13 +11,13 @@ const routes: Routes = [
   {
     path: 'auth',
     loadChildren: () =>
-      import('./core/modules/auth.module').then((m) => m.AuthModule),
+      import('./modules/auth/auth.module').then((m) => m.AuthModule),
   },
 
   {
     path: 'admin',
     loadChildren: () =>
-      import('./core/modules/questions.module').then((m) => m.QuestionsModule),
+      import('./modules/admin/admin.module').then((m) => m.AdminModule),
   },
 ];
 

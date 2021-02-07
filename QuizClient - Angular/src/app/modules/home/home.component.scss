@@ -1,0 +1,79 @@
+#home-container {
+  place-items: center;
+  display: grid;
+}
+
+.holder {
+  position: relative;
+  &:before,
+  &:after {
+    border-radius: 50%;
+    box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.2);
+    content: "";
+    height: 180px;
+    width: 180px;
+    margin: 0;
+    position: absolute;
+    top: 100%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+  }
+  &:before {
+    background: #97d2ff;
+    background: -moz-radial-gradient(top right, #97d2ff, #057ef9);
+    background: radial-gradient(to bottom left, #97d2ff, #057ef9);
+    background: -webkit-radial-gradient(top right, #97d2ff, #057ef9);
+  }
+  &:after {
+    animation-delay: -2.5s;
+    background: #f64d4f;
+    background: -moz-radial-gradient(bottom right, #fa7e7e, #f64d4f);
+    background: radial-gradient(to top left, #fa7e7e, #f64d4f);
+    background: -webkit-radial-gradient(bottom right, #fa7e7e, #f64d4f);
+    right: 0;
+    top: 0;
+    z-index: -1;
+  }
+}
+.card {
+  border: 1px solid #fff;
+  border-radius: 15px;
+  box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.2);
+  font-size: 2rem;
+  height: 350px;
+  width: 350px;
+  overflow: hidden;
+  position: relative;
+  &:before {
+    background-color: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px) saturate(100%) contrast(45%) brightness(130%);
+    -webkit-backdrop-filter: blur(10px) saturate(100%) contrast(45%)
+      brightness(130%);
+    content: "";
+    height: 100%;
+    position: absolute;
+    width: 100%;
+  }
+  &-body {
+    color: #0d232d;
+    margin-top: 30px;
+    position: relative;
+    display: grid;
+    place-items: center;
+    z-index: 2;
+  }
+  &-title {
+    font-size: 40px;
+  }
+  &-text {
+    margin-top: 30px;
+    font-size: 30px;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .card {
+    width: 300px;
+    height: 300px;
+  }
+}

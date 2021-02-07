@@ -8,6 +8,9 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSidenavModule } from '@angular/material/sidenav';
 
 const materialModules = [
   MatCardModule,
@@ -17,7 +20,10 @@ const materialModules = [
   MatExpansionModule,
   MatProgressSpinnerModule,
   MatPaginatorModule,
+  MatSlideToggleModule,
   MatDialogModule,
+  MatIconModule,
+  MatSidenavModule,
 ];
 
 @NgModule({
