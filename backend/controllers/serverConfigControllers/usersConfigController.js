@@ -42,7 +42,6 @@ const createUsersTableWithData = async () => {
       .request()
       .query(createTableQuery)
       .catch((err) => {
-        console.log(err.message);
         throw new AppError(
           `Table ${UsersTable.TABLE_NAME} already created!`,
           400

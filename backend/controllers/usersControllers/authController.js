@@ -11,7 +11,6 @@ const AppError = require("../../utils/appError");
 const sendEmail = require("../../utils/email");
 
 const signToken = (id) => {
-  console.log("sign token " + id);
   return jwt.sign({ id }, config.jwtSecret, {
     expiresIn: "1d",
   });
@@ -83,7 +82,6 @@ const updateUserToken = async ({ id, token, expire }) => {
       .request()
       .query(usersQueries.updateUserResetTokenQuery({ id, token, expire }));
   } catch (error) {
-    console.log(error);
     throw new AppError(`Could not update user's token!`);
   }
 };

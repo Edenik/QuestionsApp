@@ -134,6 +134,14 @@ export class CreateQuestionComponent implements OnInit, OnDestroy {
               difficulity,
               correctAnswer,
             };
+            this.form.setValue({
+              question: this.questionOBJ.question,
+              option1: this.questionOBJ.option1,
+              option2: this.questionOBJ.option2,
+              option3: this.questionOBJ.option3,
+              difficulity: this.questionOBJ.difficulity,
+              correctAnswer: this.questionOBJ.correctAnswer,
+            });
           });
       } else {
         this.mode = Mode.create;

@@ -41,7 +41,7 @@ const newQuestionQuery = `INSERT INTO [dbo].[${QuestionsTable.TABLE_NAME}]
    [${QuestionsTable.COL_DIFFICULITY}], 
    [${QuestionsTable.COL_CORRECT_ANSWER}])  
    VALUES ( 
-     @${QuestionsTable.COL_QUESTION} ,
+     @${QuestionsTable.COL_QUESTION},
       @${QuestionsTable.COL_OPTION1}, 
       @${QuestionsTable.COL_OPTION2},
       @${QuestionsTable.COL_OPTION3},
@@ -99,6 +99,7 @@ const removeTableQuery = (force) =>
   `DROP TABLE ${force === true ? "IF EXISTS" : ""} ${
     QuestionsTable.TABLE_NAME
   }`;
+
 module.exports = {
   selectAllFromQuestionsQuery,
   selectAllFromQuestionsPaginatingQuery,
