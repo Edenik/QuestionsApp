@@ -4,9 +4,11 @@ import { CreateQuestionComponent } from './admin/questions/create-question/creat
 import { QuestionsListComponent } from './admin/questions/questions-list/questions-list/questions-list.component';
 import { LoginComponent } from './auth/login/login.component';
 import { SignupComponent } from './auth/signup/signup.component';
+import { HomeComponent } from './home/home.component';
 
 const routes: Routes = [
-  { path: '', component: QuestionsListComponent },
+  { path: '', component: HomeComponent },
+  { path: 'questions', component: QuestionsListComponent },
   { path: 'create', component: CreateQuestionComponent },
   { path: 'edit/:id', component: CreateQuestionComponent },
   { path: 'login', component: LoginComponent },

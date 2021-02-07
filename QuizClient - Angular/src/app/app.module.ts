@@ -8,7 +8,7 @@ import { GameComponent } from './game/game.component';
 import { CelebrateComponent } from './modules/shared/celebrate/celebrate.component';
 import { CreateQuestionComponent } from './admin/questions/create-question/create-question.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
@@ -22,6 +22,8 @@ import { HeaderComponent } from './admin/header/header.component';
 import { QuestionsListComponent } from './admin/questions/questions-list/questions-list/questions-list.component';
 import { SignupComponent } from './auth/signup/signup.component';
 import { LoginComponent } from './auth/login/login.component';
+import { AuthInterceptor } from './core/services/auth-interceptor';
+import { HomeComponent } from './home/home.component';
 
 const matModules = [
   MatCardModule,
@@ -42,6 +44,7 @@ const matModules = [
     QuestionsListComponent,
     SignupComponent,
     LoginComponent,
+    HomeComponent,
   ],
   imports: [
     BrowserModule,
@@ -53,7 +56,9 @@ const matModules = [
 
     ...matModules,
   ],
-  providers: [],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

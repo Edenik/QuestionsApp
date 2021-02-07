@@ -20,6 +20,39 @@ const checkUserBody = (req, res, next) => {
   next();
 };
 
+const checkUserBodyForUpdate = (req, res, next) => {
+  const filteredBody = filterObj(
+    req.body,
+    "email",
+    "username",
+    "password",
+    "role",
+    "highscore"
+  );
+  console.log(filteredBody);
+  const errors = [];
+  if (!/^[0-5]$/.test(filteredBody.highscore))
+    errors.push("Please provide highscore between 0-5!");
+
+  if (!filteredBody.username) errors.push("Please provide username!");
+  if (!filteredBody.email) errors.push("Please provide email!");
+  if (!filteredBody.password) errors.push("Please provide password!");
+  if (!filteredBody.role) errors.push("Please provide role!");
+  if (errors.length > 0) throw new Error(errors.join(" "));
+  req.userOBJ = new User(
+    filteredBody.email,
+    filteredBody.username,
+    filteredBody.password,
+    "user",
+    req.params.id,
+    filteredBody.highscore
+  );
+
+  console.log(req.userOBJ);
+  if (req.params.id !== undefined) req.userOBJ.setId(req.params.id * 1);
+  next();
+};
+
 const checkQuestionBody = (req, res, next) => {
   const filteredBody = filterObj(
     req.body,
@@ -51,4 +84,4 @@ const checkQuestionBody = (req, res, next) => {
   next();
 };
 
-module.exports = { checkUserBody, checkQuestionBody };
+module.exports = { checkUserBody, checkQuestionBody, checkUserBodyForUpdate };

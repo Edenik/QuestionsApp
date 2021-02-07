@@ -3,25 +3,21 @@ import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/core/services/auth.service';
 
 @Component({
-  selector: 'app-header',
-  templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss'],
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.scss'],
 })
-export class HeaderComponent implements OnInit, OnDestroy {
-  public userIsAuthenticated: boolean = false;
+export class HomeComponent implements OnInit, OnDestroy {
+  public userIsAuthenticated: boolean;
   private authListenerSubs: Subscription;
   constructor(private authService: AuthService) {}
 
-  onLogout() {
-    this.authService.logout();
-  }
-
   ngOnInit(): void {
+    this.userIsAuthenticated = this.authService.getIsAuth();
     this.authListenerSubs = this.authService
       .getAuthStatusListener()
       .subscribe((isAuthenticated) => {
-        console.log('event changed  from jheader ' + isAuthenticated);
-
+        console.log('event changed ' + isAuthenticated);
         this.userIsAuthenticated = isAuthenticated;
       });
   }

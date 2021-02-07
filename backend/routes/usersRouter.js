@@ -5,7 +5,10 @@ const authController = require("../controllers/usersControllers/authController")
 const router = express.Router();
 const AppError = require("../utils/appError");
 const protectRoutesMiddle = require("../middlewares/protectRoutesMiddle");
-const { checkUserBody } = require("../middlewares/checkReqBodyMiddle");
+const {
+  checkUserBody,
+  checkUserBodyForUpdate,
+} = require("../middlewares/checkReqBodyMiddle");
 
 router
   .route("/me")
@@ -56,9 +59,9 @@ router
     usersAdminController.getUser
   )
   .patch(
-    protectRoutesMiddle.protect,
-    protectRoutesMiddle.restrictTo("admin"),
-    checkUserBody,
+    // protectRoutesMiddle.protect,
+    // protectRoutesMiddle.restrictTo("admin"),
+    checkUserBodyForUpdate,
     usersAdminController.onUpdate
   )
   .delete(

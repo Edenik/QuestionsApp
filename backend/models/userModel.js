@@ -8,6 +8,7 @@ class User {
     password,
     role = "user",
     id,
+    highscore = 0,
     passwordChangedAt,
     passwordResetToken,
     passwordResetExpires,
@@ -16,7 +17,7 @@ class User {
     this.email = email;
     this.username = username;
     this.role = !/(admin|user)/.test(role) ? "user" : role;
-    this.highscore = 0;
+    this.highscore = highscore;
     this.password = password;
     this.id = id;
     this.passwordChangedAt = passwordChangedAt;

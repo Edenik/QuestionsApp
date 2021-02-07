@@ -11,20 +11,19 @@ router.route("/random").get(
   questionsController.getQuestionsWithDifficulity
 );
 
-router.route("/check").get(
-  // protectRoutesMiddle.protect,
-  questionsController.checkAnswer
-);
+router
+  .route("/check")
+  .get(protectRoutesMiddle.protect, questionsController.checkAnswer);
 
 router
   .route("/")
   .get(
-    // protectRoutesMiddle.protect,
+    protectRoutesMiddle.protect,
     // protectRoutesMiddle.restrictTo("admin"),
     questionsAdminController.getQuestions
   )
   .post(
-    // protectRoutesMiddle.protect,
+    protectRoutesMiddle.protect,
     // protectRoutesMiddle.restrictTo("admin"),
     checkQuestionBody,
     questionsAdminController.onCreate
@@ -33,18 +32,18 @@ router
 router
   .route("/:id")
   .get(
-    // protectRoutesMiddle.protect,
+    protectRoutesMiddle.protect,
     // protectRoutesMiddle.restrictTo("admin"),
     questionsAdminController.getQuestion
   )
   .put(
-    // protectRoutesMiddle.protect,
+    protectRoutesMiddle.protect,
     // protectRoutesMiddle.restrictTo("admin"),
     checkQuestionBody,
     questionsAdminController.onUpdate
   )
   .delete(
-    // protectRoutesMiddle.protect,
+    protectRoutesMiddle.protect,
     // protectRoutesMiddle.restrictTo("admin"),
     questionsAdminController.onDelete
   );

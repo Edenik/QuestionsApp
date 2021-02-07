@@ -57,29 +57,18 @@ const getUser = catchAsync(async (req, res, next) => {
 const onUpdate = catchAsync(async (req, res, next) => {
   const pool = await dbClient.getConnection(config.sql);
 
-  const userOBJ = { ...req.body.userOBJ };
+  if (!/(admin|user)/.test(req.userOBJ.role)) userOBJ.role = "user";
 
-  if (!/(admin|user)/.test(userOBJ.role)) userOBJ.role = "user";
-
-  const user = new User(
-    userOBJ.email,
-    userOBJ.username,
-    userOBJ.password,
-    userOBJ.role,
-    userOBJ.highscore,
-    userOBJ.id
-  );
-
-  await pool.request().query(usersQueries.updateFullUserQuery(user));
+  await pool.request().query(usersQueries.updateFullUserQuery(req.userOBJ));
 
   res.status(201).json({
     status: "success",
     data: {
-      email: userOBJ.email,
-      username: userOBJ.username,
-      role: userOBJ.role,
-      highscore: userOBJ.highscore,
-      id: userOBJ.id,
+      email: req.userOBJ.email,
+      username: req.userOBJ.username,
+      role: req.userOBJ.role,
+      highscore: req.userOBJ.highscore,
+      id: req.userOBJ.id,
     },
   });
 });
