@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap } from '@angular/router';
-import { Mock } from 'protractor/built/driverProviders';
+import { Subscription } from 'rxjs';
 import { Mode } from 'src/app/core/models/enums.model';
 import { Question } from 'src/app/core/models/question.model';
+import { AuthService } from 'src/app/core/services/auth.service';
 import { QuestionsService } from 'src/app/core/services/questions.service';
 
 @Component({
@@ -11,45 +12,101 @@ import { QuestionsService } from 'src/app/core/services/questions.service';
   templateUrl: './create-question.component.html',
   styleUrls: ['./create-question.component.scss'],
 })
-export class CreateQuestionComponent implements OnInit {
+export class CreateQuestionComponent implements OnInit, OnDestroy {
   private mode: Mode = Mode.create;
   private questionId: number = null;
+  private authStatusSub: Subscription;
+  form: FormGroup;
+
   questionOBJ: Question;
   isLoading: boolean = false;
 
   constructor(
-    public questionsService: QuestionsService,
-    public route: ActivatedRoute
+    private questionsService: QuestionsService,
+    private route: ActivatedRoute,
+    private authService: AuthService
   ) {}
 
-  onSaveQuestion(form: NgForm) {
-    if (form.invalid) return;
+  onSaveQuestion() {
+    if (this.form.invalid) return;
 
     this.isLoading = true;
     if (this.mode === Mode.create) {
       this.questionsService.addQuestion(
-        form.value.question,
-        form.value.option1,
-        form.value.option2,
-        form.value.option3,
-        form.value.correctAnswer * 1,
-        form.value.difficulity
+        this.form.value.question,
+        this.form.value.option1,
+        this.form.value.option2,
+        this.form.value.option3,
+        this.form.value.correctAnswer * 1,
+        this.form.value.difficulity
       );
     } else {
       this.questionsService.updateQuestion(
         this.questionId,
-        form.value.question,
-        form.value.option1,
-        form.value.option2,
-        form.value.option3,
-        form.value.correctAnswer * 1,
-        form.value.difficulity
+        this.form.value.question,
+        this.form.value.option1,
+        this.form.value.option2,
+        this.form.value.option3,
+        this.form.value.correctAnswer * 1,
+        this.form.value.difficulity
       );
     }
-    form.resetForm();
+    this.form.reset();
+  }
+
+  setFormGroup(): void {
+    this.form = new FormGroup({
+      question: new FormControl(null, {
+        validators: [
+          Validators.required,
+          Validators.minLength(20),
+          Validators.maxLength(150),
+        ],
+      }),
+      option1: new FormControl(null, {
+        validators: [
+          Validators.required,
+          Validators.minLength(5),
+          Validators.maxLength(100),
+        ],
+      }),
+      option2: new FormControl(null, {
+        validators: [
+          Validators.required,
+          Validators.minLength(5),
+          Validators.maxLength(100),
+        ],
+      }),
+      option3: new FormControl(null, {
+        validators: [
+          Validators.required,
+          Validators.minLength(5),
+          Validators.maxLength(100),
+        ],
+      }),
+
+      correctAnswer: new FormControl(null, {
+        validators: [Validators.required, Validators.pattern(/(1|2|3)/)],
+      }),
+
+      difficulity: new FormControl(null, {
+        validators: [
+          Validators.required,
+          Validators.pattern(/^easy|medium|high^/),
+        ],
+      }),
+    });
   }
 
   ngOnInit(): void {
+    this.authStatusSub = this.authService
+      .getAuthStatusListener()
+      .subscribe((authStatus) => {
+        this.isLoading = false;
+      });
+
+    this.setFormGroup();
+
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
       if (paramMap.has('id')) {
         this.mode = Mode.edit;
@@ -59,7 +116,6 @@ export class CreateQuestionComponent implements OnInit {
           .getQuestion(this.questionId)
           .subscribe((questionData) => {
             this.isLoading = false;
-            // console.log(questionData);
             const {
               id,
               question,
@@ -79,11 +135,14 @@ export class CreateQuestionComponent implements OnInit {
               correctAnswer,
             };
           });
-        console.log(this.questionOBJ);
       } else {
         this.mode = Mode.create;
         this.questionId = null;
       }
     });
+  }
+
+  ngOnDestroy() {
+    this.authStatusSub.unsubscribe();
   }
 }

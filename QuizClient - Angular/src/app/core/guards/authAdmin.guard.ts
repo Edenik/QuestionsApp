@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class AuthAdminGuard implements CanActivate {
   constructor(private authService: AuthService, private router: Router) {}
   canActivate(
     route: ActivatedRouteSnapshot,
@@ -21,10 +21,9 @@ export class AuthGuard implements CanActivate {
     | Observable<boolean | UrlTree>
     | Promise<boolean | UrlTree> {
     const role = this.authService.getRole();
-    const isAdmin = role && role === 'admin';
-    if (isAdmin) {
-      console.log('you are not admin');
-      this.router.navigate(['/login']);
+    const isAdmin = role && role === 'admin' ? true : false;
+    if (!isAdmin) {
+      this.router.navigate(['/']);
     }
     return isAdmin;
   }

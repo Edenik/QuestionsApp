@@ -29,7 +29,6 @@ const checkUserBodyForUpdate = (req, res, next) => {
     "role",
     "highscore"
   );
-  console.log(filteredBody);
   const errors = [];
   if (!/^[0-5]$/.test(filteredBody.highscore))
     errors.push("Please provide highscore between 0-5!");
@@ -48,7 +47,6 @@ const checkUserBodyForUpdate = (req, res, next) => {
     filteredBody.highscore
   );
 
-  console.log(req.userOBJ);
   if (req.params.id !== undefined) req.userOBJ.setId(req.params.id * 1);
   next();
 };

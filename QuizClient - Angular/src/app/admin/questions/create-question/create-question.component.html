@@ -1,41 +1,39 @@
 <mat-card>
   <mat-spinner *ngIf="isLoading"></mat-spinner>
-  <form (submit)="onSaveQuestion(questionForm)" #questionForm="ngForm" *ngIf="!isLoading">
+  <form [formGroup]="form" (submit)="onSaveQuestion()" *ngIf="!isLoading">
     <mat-form-field>
-      <textarea matInput rows="2" type="text" [ngModel]="questionOBJ?.question" name="question" #question="ngModel"
-        placeholder="Question" required minlength="20" maxlength="150"></textarea>
-      <mat-error *ngIf="question.invalid">Please enter a question. (Min 20 chars, Max 150 chars)</mat-error>
+      <textarea matInput rows="2" type="text" formControlName="question" placeholder="Question"></textarea>
+      <mat-error *ngIf="form.get('question').invalid">Please enter a question. (Min 20 chars, Max 150 chars)</mat-error>
     </mat-form-field>
 
     <mat-form-field>
-      <input matInput type="text" [ngModel]="questionOBJ?.option1" name="option1" #option1="ngModel"
-        placeholder="Option 1" required minlength="5" maxlength="100">
-      <mat-error *ngIf="option1.invalid">Please enter option 1 text. (Min 5 chars, Max 100 chars)</mat-error>
+      <input matInput type="text" formControlName="option1" placeholder="Option 1">
+      <mat-error *ngIf="form.get('option1').invalid">Please enter option 1 text. (Min 5 chars, Max 100 chars)
+      </mat-error>
     </mat-form-field>
 
     <mat-form-field>
-      <input matInput type="text" [ngModel]="questionOBJ?.option2" name="option2" #option2="ngModel"
-        placeholder="Option 2" required minlength="5" maxlength="100">
-      <mat-error *ngIf="option2.invalid">Please enter option 2 text. (Min 5 chars, Max 100 chars)</mat-error>
+      <input matInput type="text" formControlName="option2" placeholder="Option 2">
+      <mat-error *ngIf="form.get('option2').invalid">Please enter option 2 text. (Min 5 chars, Max 100 chars)
+      </mat-error>
     </mat-form-field>
 
     <mat-form-field>
-      <input matInput type="text" [ngModel]="questionOBJ?.option3" name="option3" #option3="ngModel"
-        placeholder="Option 3" required minlength="5" maxlength="100">
-      <mat-error *ngIf="option3.invalid">Please enter option 3 text. (Min 5 chars, Max 100 chars)</mat-error>
+      <input matInput type="text" formControlName="option3" placeholder="Option 3">
+      <mat-error *ngIf="form.get('option3').invalid">Please enter option 3 text. (Min 5 chars, Max 100 chars)
+      </mat-error>
     </mat-form-field>
 
     <mat-form-field>
-      <input matInput type="text" [ngModel]="questionOBJ?.correctAnswer" name="correctAnswer" #correctAnswer="ngModel"
-        placeholder="Correct answer" required minlength="1" maxlength="1">
-      <mat-error *ngIf="correctAnswer.invalid">Please enter the number of the correct answer. (1-3)</mat-error>
+      <input matInput type="text" formControlName="correctAnswer" placeholder="Correct answer">
+      <mat-error *ngIf="form.get('correctAnswer').invalid">Please enter the number of the correct answer. (1-3)
+      </mat-error>
     </mat-form-field>
 
 
     <mat-form-field>
-      <input matInput type="text" [ngModel]="questionOBJ?.difficulity" name="difficulity" #difficulity="ngModel"
-        placeholder="Difficulity" required maxlength="6">
-      <mat-error *ngIf="difficulity.invalid">Please enter difficulity. (easy,medium,hard)</mat-error>
+      <input matInput type="text" formControlName="difficulity" placeholder="Difficulity">
+      <mat-error *ngIf="form.get('difficulity').invalid">Please enter difficulity. (easy,medium,hard)</mat-error>
     </mat-form-field>
 
     <button mat-raised-button color="primary" type="submit">Save Question</button>

@@ -11,6 +11,7 @@ const AppError = require("../../utils/appError");
 const sendEmail = require("../../utils/email");
 
 const signToken = (id) => {
+  console.log("sign token " + id);
   return jwt.sign({ id }, config.jwtSecret, {
     expiresIn: "1d",
   });
@@ -191,7 +192,7 @@ const login = catchAsync(async (req, res, next) => {
     user.username,
     user.password,
     user.role,
-    user._ID,
+    user.id,
     user.highscore
   );
 
@@ -202,7 +203,6 @@ const login = catchAsync(async (req, res, next) => {
   ) {
     next(new AppError("Incorrect email or password!", 401));
   }
-
   createSendToken(currentUser, 200, res);
 });
 
@@ -218,7 +218,7 @@ const forgotPassword = catchAsync(async (req, res, next) => {
     user.username,
     user.password,
     user.role,
-    user._ID,
+    user.id,
     user.passwordChangedAt,
     user.passwordResetToken,
     user.passwordResetExpires

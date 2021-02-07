@@ -17,7 +17,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.authListenerSubs = this.authService
       .getAuthStatusListener()
       .subscribe((isAuthenticated) => {
-        console.log('event changed ' + isAuthenticated);
         this.userIsAuthenticated = isAuthenticated;
       });
   }

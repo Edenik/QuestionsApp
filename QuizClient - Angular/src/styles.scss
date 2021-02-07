@@ -71,16 +71,3 @@ $custom-typography: mat-typography-config(
 
 @include angular-material-theme($quiz-blue-theme);
 @include mat-core($custom-typography);
-
-main {
-  margin-top: 2rem;
-}
-
-html,
-body {
-  height: 100%;
-}
-body {
-  margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
-}

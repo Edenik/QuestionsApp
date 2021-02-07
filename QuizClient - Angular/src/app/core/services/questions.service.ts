@@ -19,7 +19,7 @@ export class QuestionsService {
     const queryParams = `?pagesize=${postsPerPage}&page=${currentPage}`;
     this.http
       .get<{ status: string; total: number; data: { questions: Question[] } }>(
-        `${environment.apiUrl}/questions/${queryParams}`
+        `${environment.apiUrl}/questions${queryParams}`
       )
       .subscribe((questionsData) => {
         this.questions = [...questionsData.data.questions];
@@ -89,7 +89,7 @@ export class QuestionsService {
     this.http
       .put(`${environment.apiUrl}/questions/${id}`, questionOBJ)
       .subscribe(() => {
-        this.router.navigate(['/']);
+        this.router.navigate(['/questions']);
       });
   }
 

@@ -32,16 +32,17 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith("Bearer")
   ) {
     token = req.headers.authorization.split(" ")[1];
-  }
-
-  if (!token) {
-    return next(
-      new AppError("You are not logged in! To get access, please log in!", 401)
-    );
-  }
+  } else
+    () => {
+      return next(
+        new AppError(
+          "You are not logged in! To get access, please log in!",
+          401
+        )
+      );
+    };
 
   const decoded = await decodeToken(token, next);
-
   const pool = await dbClient.getConnection(config.sql);
 
   const getUserQuery = `SELECT * 
@@ -51,8 +52,8 @@ exports.protect = catchAsync(async (req, res, next) => {
   let user = await pool
     .request()
     .query(getUserQuery)
-    .catch(() => {
-      next(new AppError("Error with DB! (No data or connection error)"));
+    .catch((err) => {
+      next(new AppError("Error with DB! (No data or connection error)", 500));
     });
 
   user = user.recordset[0];

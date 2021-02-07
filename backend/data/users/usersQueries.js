@@ -18,7 +18,7 @@ ${UsersTable.COL_ACTIVE} TINYINT NOT NULL
 const removeTableQuery = (force) =>
   `DROP TABLE ${force === true ? "IF EXISTS" : ""} ${UsersTable.TABLE_NAME}`;
 
-const findUserByConditionQuery = ({ key, value }) => `SELECT [_ID]
+const findUserByConditionQuery = ({ key, value }) => `SELECT [_ID] AS id
   ,[${UsersTable.COL_EMAIL}]
   ,[${UsersTable.COL_USERNAME}]
   ,[${UsersTable.COL_PASSWORD}]
@@ -30,7 +30,7 @@ const findUserByConditionQuery = ({ key, value }) => `SELECT [_ID]
 FROM [QuizApp].[dbo].[users] 
 WHERE ${key} = '${value}'`;
 
-const checkIfEmailExistsQuery = (email) => `SELECT [_ID]
+const checkIfEmailExistsQuery = (email) => `SELECT [_ID] AS id
 ,[${UsersTable.COL_EMAIL}]
 FROM [QuizApp].[dbo].[users] 
 WHERE email = '${email}'`;
@@ -70,7 +70,7 @@ const newUserQuery = `INSERT INTO [dbo].[${UsersTable.TABLE_NAME}]
                  ); SELECT SCOPE_IDENTITY() AS id;`;
 
 const getUserByEmailQuery = `SELECT 
-                 [_ID]
+                 [_ID] AS id
                    ,[${UsersTable.COL_EMAIL}]
                    ,[${UsersTable.COL_USERNAME}]
                    ,[${UsersTable.COL_PASSWORD}]
@@ -101,12 +101,25 @@ const updatePasswordQuery = async (password, id) => `UPDATE [${
   12
 )}' 
                         WHERE _ID = ${id}`;
-const getActiveDeactiveUsers = (active) => `SELECT *
+const getActiveDeactiveUsers = (active) => `SELECT [_ID] AS id
+,[${UsersTable.COL_EMAIL}]
+,[${UsersTable.COL_USERNAME}]
+,[${UsersTable.COL_ROLE}]
+,[${UsersTable.COL_HIGHSCORE}]
+,[${UsersTable.COL_PASSWORD_CHANGED_AT}]
+,[${UsersTable.COL_PASSWORD_RESET_EXPIRES}]
 FROM [${config.sql.database}].[dbo].[${UsersTable.TABLE_NAME}]
 ${active !== undefined ? `WHERE ${UsersTable.COL_ACTIVE} = ${active}` : ""}
 `;
 
-const getAllDataFromUser = (id) => `SELECT * 
+const getAllDataFromUser = (id) => `SELECT [_ID] AS id
+,[${UsersTable.COL_EMAIL}]
+,[${UsersTable.COL_USERNAME}]
+,[${UsersTable.COL_ROLE}]
+,[${UsersTable.COL_HIGHSCORE}]
+,[${UsersTable.COL_PASSWORD_CHANGED_AT}]
+,[${UsersTable.COL_PASSWORD_RESET_TOKEN}]
+,[${UsersTable.COL_PASSWORD_RESET_EXPIRES}] 
 FROM [${config.sql.database}].[dbo].[${UsersTable.TABLE_NAME}]
 WHERE _ID = ${id}`;
 
@@ -133,7 +146,7 @@ const deleteUserQuery = (
             WHERE _ID = ${id}`;
 
 const getUserDetailsWithOrWithoutPassword = (getPassword, id) => `SELECT 
-            [_ID]
+            [_ID] AS id
                 ,[${UsersTable.COL_EMAIL}]
                 ,[${UsersTable.COL_USERNAME}]
                 ,[${UsersTable.COL_ROLE}]
@@ -165,7 +178,7 @@ const activateUserQuery = (
                                   ${UsersTable.COL_ACTIVE} = '${activate}' 
                                   WHERE _ID = ${id}`;
 
-const getUserHighScores = `SELECT [_ID]
+const getUserHighScores = `SELECT [_ID] AS id
 ,[${UsersTable.COL_EMAIL}]
 ,[${UsersTable.COL_USERNAME}]
 ,[${UsersTable.COL_ROLE}]

@@ -10,7 +10,6 @@ const getQuestions = catchAsync(async (req, res, next) => {
   const pageSize = req.query.pagesize;
   const currentPage = req.query.page;
   let query = questionsQueries.selectAllFromQuestionsQuery;
-  console.log(req.query);
   if (pageSize && currentPage) {
     const skip = pageSize * (currentPage - 1);
     const limit = pageSize;

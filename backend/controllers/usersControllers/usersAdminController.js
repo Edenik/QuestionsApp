@@ -19,7 +19,6 @@ const getUsers = catchAsync(async (req, res, next) => {
     .request()
     .query(usersQueries.getActiveDeactiveUsers(active))
     .catch((err) => {
-      console.log(err);
       next(new AppError("Error with DB! (No data or connection error)"));
     });
 
@@ -101,8 +100,6 @@ const getStats = catchAsync(async (req, res, next) => {
     .catch(() => {
       next(new AppError("Error with DB! (No data or connection error)"));
     });
-
-  console.log(stats.recordsets[0]);
 
   res.status(200).json({
     status: "success",

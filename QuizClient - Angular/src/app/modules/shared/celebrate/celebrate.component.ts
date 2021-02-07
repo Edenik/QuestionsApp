@@ -37,10 +37,7 @@ export class CelebrateComponent implements OnInit, OnDestroy {
     this.celebrate$ = this.celebrateService.celebrate$;
   }
   ngOnInit(): void {
-    console.log('hello from celebrate');
-
     // this.celebrate$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-    //   console.log('asjf;jsaf;');
 
     //   this.celebrate();
     // });
@@ -53,7 +50,6 @@ export class CelebrateComponent implements OnInit, OnDestroy {
     // }
   }
   ngOnDestroy(): void {
-    console.log('destroyed  from celebrate');
     this.destroy.next();
     this.destroy.complete();
   }

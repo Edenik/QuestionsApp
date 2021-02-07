@@ -11,7 +11,6 @@ export class CelebrateService {
   celebrate$ = this.celebrate.asObservable();
 
   startCelebration(): void {
-    console.log('dafd');
     this.celebrate.next();
   }
 }

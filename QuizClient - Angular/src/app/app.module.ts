@@ -19,13 +19,16 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatDialogModule } from '@angular/material/dialog';
 
-import { HeaderComponent } from './admin/header/header.component';
 import { QuestionsListComponent } from './admin/questions/questions-list/questions-list/questions-list.component';
 import { SignupComponent } from './auth/signup/signup.component';
 import { LoginComponent } from './auth/login/login.component';
-import { AuthInterceptor } from './core/services/auth-interceptor';
+import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { HomeComponent } from './home/home.component';
+import { ErrorInterceptor } from './core/interceptors/error.interceptor';
+import { ErrorComponent } from './error/error.component';
+import { HeaderComponent } from './header/header.component';
 
 const matModules = [
   MatCardModule,
@@ -35,6 +38,7 @@ const matModules = [
   MatExpansionModule,
   MatProgressSpinnerModule,
   MatPaginatorModule,
+  MatDialogModule,
 ];
 @NgModule({
   declarations: [
@@ -47,6 +51,7 @@ const matModules = [
     SignupComponent,
     LoginComponent,
     HomeComponent,
+    ErrorComponent,
   ],
   imports: [
     BrowserModule,
@@ -60,8 +65,10 @@ const matModules = [
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     CookieService,
   ],
   bootstrap: [AppComponent],
+  entryComponents: [ErrorComponent],
 })
 export class AppModule {}
