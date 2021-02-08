@@ -3,7 +3,6 @@
   <span><a (click)="router.navigate([''])">Quiz App</a></span>
   <span class="flex-spacer"></span>
 
-
   <ul>
     <li *ngIf="userIsAuthenticated && role === 'admin'">
       <a mat-button routerLink="/admin/" routerLinkActive="mat-warn"
@@ -29,17 +28,11 @@
 
   <ul>
     <li>
-
-
-
       <mat-button-toggle-group *ngIf="!url?.includes('/admin')" appearance="legacy" [value]='theme'
         (change)="onChangeEvent($event)">
         <mat-button-toggle value="blue-theme">Blue</mat-button-toggle>
         <mat-button-toggle value="red-theme">Red</mat-button-toggle>
       </mat-button-toggle-group>
-
-
-
     </li>
   </ul>
   <span class="spacer"></span>

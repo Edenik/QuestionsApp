@@ -9,11 +9,11 @@ import { AuthService } from 'src/app/modules/auth/auth.service';
   styleUrls: ['./signup.component.scss'],
 })
 export class SignupComponent implements OnInit, OnDestroy {
-  isLoading: boolean = false;
+  public isLoading: boolean = false;
   private authStatusSub: Subscription;
   constructor(public authService: AuthService) {}
 
-  onSignup(form: NgForm) {
+  onSignup(form: NgForm): void {
     if (form.invalid) return;
     this.isLoading = true;
     this.authService.createUser(

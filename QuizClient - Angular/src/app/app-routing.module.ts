@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './modules/auth/auth.guard';
 import { AuthAdminGuard } from './modules/admin/authAdmin.guard';
 import { HomeComponent } from './modules/home/home.component';
+import { AuthInverseGuard } from './modules/auth/authInverse.guard';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -16,6 +17,7 @@ const routes: Routes = [
     path: 'auth',
     loadChildren: () =>
       import('./modules/auth/auth.module').then((m) => m.AuthModule),
+    canActivate: [AuthInverseGuard],
   },
   {
     path: 'admin',
@@ -28,6 +30,6 @@ const routes: Routes = [
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
-  providers: [AuthGuard, AuthAdminGuard],
+  providers: [AuthGuard, AuthAdminGuard, AuthInverseGuard],
 })
 export class AppRoutingModule {}

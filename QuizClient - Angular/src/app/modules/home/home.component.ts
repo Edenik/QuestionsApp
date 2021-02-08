@@ -1,10 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  OnDestroy,
-  OnInit,
-  Output,
-} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/modules/auth/auth.service';
 import { User } from '../../core/models/user.model';
@@ -17,9 +11,8 @@ import { User } from '../../core/models/user.model';
 export class HomeComponent implements OnInit, OnDestroy {
   public userIsAuthenticated: boolean = false;
   private authListenerSubs: Subscription;
-
-  user: User;
-  isLoading: boolean = false;
+  public user: User;
+  public isLoading: boolean = false;
   constructor(private authService: AuthService) {}
 
   ngOnInit(): void {
@@ -34,7 +27,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.isLoading = false;
       },
       (err) => {
-        console.error(err);
+        // console.error(err);
       }
     );
   }

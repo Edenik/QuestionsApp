@@ -1,6 +1,3 @@
-<!-- <app-game *ngIf="!isLoading && userIsAuthenticated && user && user.active"></app-game> -->
-
-
 <div id="home-container">
   <div id="circles">
     <div class="home-card">
@@ -14,10 +11,6 @@
           <a *ngIf="!userIsAuthenticated" mat-raised-button routerLink="/auth/login" color="primary">Login</a>
           <a *ngIf="userIsAuthenticated" mat-raised-button routerLink="/game" color="primary">Go to Game</a>
         </p>
-
-
-
-
       </div>
 
     </div>

@@ -14,7 +14,7 @@ export class AppComponent implements OnInit {
   ) {}
   @HostBinding('class') componentCssClass: string;
 
-  setTheme(theme: string) {
+  setTheme(theme: string): void {
     this.addThemeClass(theme);
     localStorage.setItem('quiz-app-theme', theme);
   }
@@ -29,7 +29,7 @@ export class AppComponent implements OnInit {
     }
   }
 
-  addThemeClass(theme: string) {
+  addThemeClass(theme: string): void {
     this.overlayContainer.getContainerElement().classList.add(theme);
     this.componentCssClass = theme;
   }

@@ -16,10 +16,9 @@ export class CreateQuestionComponent implements OnInit, OnDestroy {
   private mode: EditQuestionMode = EditQuestionMode.create;
   private questionId: number = null;
   private authStatusSub: Subscription;
-  form: FormGroup;
-
-  questionOBJ: Question;
-  isLoading: boolean = false;
+  public form: FormGroup;
+  private questionOBJ: Question;
+  public isLoading: boolean = false;
 
   constructor(
     private questionsService: QuestionsService,
@@ -27,7 +26,7 @@ export class CreateQuestionComponent implements OnInit, OnDestroy {
     private authService: AuthService
   ) {}
 
-  onSaveQuestion() {
+  onSaveQuestion(): void {
     if (this.form.invalid) return;
 
     this.isLoading = true;
@@ -84,7 +83,6 @@ export class CreateQuestionComponent implements OnInit, OnDestroy {
           Validators.maxLength(20),
         ],
       }),
-
       correctAnswer: new FormControl(null, {
         validators: [Validators.required, Validators.pattern(/(1|2|3)/)],
       }),
@@ -101,7 +99,7 @@ export class CreateQuestionComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.authStatusSub = this.authService
       .getAuthStatusListener()
-      .subscribe((authStatus) => {
+      .subscribe((authStatus: boolean) => {
         this.isLoading = false;
       });
 
@@ -112,7 +110,6 @@ export class CreateQuestionComponent implements OnInit, OnDestroy {
         this.mode = EditQuestionMode.edit;
         this.questionId = parseInt(paramMap.get('id'));
         this.isLoading = true;
-        console.error(this.questionId);
         this.questionsService
           .getQuestion(this.questionId)
           .subscribe((questionData) => {
@@ -151,7 +148,7 @@ export class CreateQuestionComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.authStatusSub.unsubscribe();
   }
 }

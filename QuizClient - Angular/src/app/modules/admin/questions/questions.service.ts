@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { Question } from './question.model';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
@@ -75,7 +75,7 @@ export class QuestionsService {
     option3: string,
     correctAnswer: number,
     difficulity: string
-  ) {
+  ): void {
     const questionOBJ: Question = {
       id,
       question,
@@ -93,7 +93,7 @@ export class QuestionsService {
       });
   }
 
-  deleteQuestion(questionId: number) {
+  deleteQuestion(questionId: number): Observable<object> {
     return this.http.delete(`${environment.apiUrl}/questions/${questionId}`);
   }
 }

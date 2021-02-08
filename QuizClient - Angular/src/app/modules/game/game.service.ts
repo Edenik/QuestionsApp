@@ -1,24 +1,22 @@
 import { HttpClient } from '@angular/common/http';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { Question } from '../admin/questions/question.model';
 import { Difficulity } from 'src/app/core/models/enums.model';
-import { AuthService } from '../auth/auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GameService {
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(private http: HttpClient) {}
   private questions: Question[] = [];
   private questionsUpdated = new Subject<{
     questions: Question[];
     total: number;
   }>();
 
-  getRandomQuestions(difficulity: Difficulity) {
+  getRandomQuestions(difficulity: Difficulity): void {
     const queryParams = `?difficulity=${difficulity}`;
     this.http
       .get<{ status: string; total: number; data: { questions: Question[] } }>(
@@ -33,7 +31,10 @@ export class GameService {
       });
   }
 
-  checkAnswer(question: number, answer: number) {
+  checkAnswer(
+    question: number,
+    answer: number
+  ): Observable<{ status: string; correct: Boolean }> {
     const queryParams = `?question=${question}&answer=${answer}`;
     return this.http.get<{ status: string; correct: Boolean }>(
       `${environment.apiUrl}/questions/check${queryParams}`
