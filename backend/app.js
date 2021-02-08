@@ -40,7 +40,6 @@ app.use(xss());
 app.use(hpp());
 
 // Routes
-
 if (process.env.NODE_ENV === "development") {
   app.use("/api/v1/serverConfig", serverConfigRouter);
 }

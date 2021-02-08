@@ -10,23 +10,37 @@ exports.questionsData = [
     "easy",
     1
   ),
-  new Question("How many hours in a day?", "12", "18", "24", "easy", 3),
+  new Question("How many hours in a day?", "24", "12", "18", "easy", 1),
   new Question(
     "Which of the types is not image?",
     ".png",
     ".exe",
     ".jpeg",
     "easy",
-    3
+    2
+  ),
+  new Question(
+    "Which one is not Programming language?",
+    "CSS",
+    "JavaScript",
+    "TypeScript",
+    "easy",
+    1
+  ),
+  new Question("7*7?", "12", "94", "49", "easy", 3),
+  new Question("First character of Alphabeth?", "V", "A", "C", "easy", 2),
+  new Question(
+    "Which one is not social porpuses app?",
+    "Facebook",
+    "Yad2",
+    "Instagram",
+    "easy",
+    2
   ),
   new Question("C is correct", "A", "B", "C", "easy", 3),
-  new Question("C is correct", "A", "B", "C", "easy", 3),
-  new Question("C is correct", "A", "B", "C", "easy", 3),
-  new Question("C is correct", "A", "B", "C", "easy", 3),
-  new Question("C is correct", "A", "B", "C", "easy", 3),
-  new Question("C is correct", "A", "B", "C", "easy", 3),
-  new Question("C is correct", "A", "B", "C", "easy", 3),
-  new Question("C is correct", "A", "B", "C", "easy", 3),
+  // new Question("C is correct", "A", "B", "C", "easy", 3),
+  // new Question("C is correct", "A", "B", "C", "easy", 3),
+  // new Question("C is correct", "A", "B", "C", "easy", 3),
   new Question("A is correct", "A", "B", "C", "medium", 1),
   new Question("A is correct", "A", "B", "C", "medium", 1),
   new Question("A is correct", "A", "B", "C", "medium", 1),
