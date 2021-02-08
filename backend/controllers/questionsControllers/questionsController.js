@@ -45,14 +45,15 @@ const checkAnswer = catchAsync(async (req, res, next) => {
   const questionFromDb = await pool
     .request()
     .query(checkAnswerQuery({ question, answer }));
+  let correct = true;
 
   if (questionFromDb.recordsets[0].length == 0) {
-    return next(new AppError("No question found or answer isn't correct."));
+    correct = false;
   }
 
   res.status(200).json({
     status: "success",
-    data: "correct",
+    correct,
   });
 });
 

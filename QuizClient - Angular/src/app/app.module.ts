@@ -14,6 +14,7 @@ import { GameComponent } from './modules/home/game/board/game.component';
 import { CelebrateComponent } from './modules/home/game/celebrate/celebrate.component';
 import { HeaderComponent } from './core/header/header.component';
 import { ErrorComponent } from './core/error/error.component';
+import { CountdownModule } from 'ngx-countdown';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { ErrorComponent } from './core/error/error.component';
     HttpClientModule,
     MaterialModule,
     OverlayModule,
+    CountdownModule,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

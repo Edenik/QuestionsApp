@@ -6,19 +6,21 @@
 
   <ul>
     <li *ngIf="userIsAuthenticated && role === 'admin'">
-      <a mat-button routerLink="/admin/" routerLinkActive="mat-warn">Questions</a>
+      <a mat-button routerLink="/admin/" routerLinkActive="mat-warn"
+        [routerLinkActiveOptions]="{ exact: true }">Admin</a>
     </li>
-    <li *ngIf="userIsAuthenticated && role === 'admin'">
-      <a mat-button routerLink="/admin/create" routerLinkActive="mat-warn">New Question</a>
+    <li *ngIf="userIsAuthenticated && role === 'admin'  && url?.includes('/admin')">
+      <a mat-button routerLink="/admin/create" routerLinkActive="mat-warn"
+        [routerLinkActiveOptions]="{ exact: true }">New Question</a>
     </li>
-    <li *ngIf="!userIsAuthenticated">
+    <li *ngIf="!userIsAuthenticated ">
       <a mat-button routerLink="/auth/login" routerLinkActive="mat-warn">Login</a>
     </li>
     <li *ngIf="!userIsAuthenticated">
       <a mat-button routerLink="/auth/signup" routerLinkActive="mat-warn">Signup</a>
     </li>
 
-    <li *ngIf="userIsAuthenticated">
+    <li *ngIf="userIsAuthenticated && !url?.includes('/admin') ">
       <button mat-button (click)="onLogout()">Logout</button>
     </li>
 
@@ -30,7 +32,8 @@
 
 
 
-      <mat-button-toggle-group appearance="legacy" [value]='theme' (change)="onChangeEvent($event)">
+      <mat-button-toggle-group *ngIf="!url?.includes('/admin')" appearance="legacy" [value]='theme'
+        (change)="onChangeEvent($event)">
         <mat-button-toggle value="blue-theme">Blue</mat-button-toggle>
         <mat-button-toggle value="red-theme">Red</mat-button-toggle>
       </mat-button-toggle-group>

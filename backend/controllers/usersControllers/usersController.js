@@ -1,5 +1,4 @@
 const config = require("../../config");
-const UsersTable = require("../../data/users/usersTable");
 const usersQueries = require("../../data/users/usersQueries");
 const User = require("../../models/userModel");
 const catchAsync = require("../../utils/catchAsync");
@@ -26,6 +25,23 @@ const getCurrentUser = async ({ id, getPassword, next }) => {
   }
 };
 
+const updateHighscore = catchAsync(async (req, res, next) => {
+  const { userId, HigH_Sc0rE } = req.body;
+  if (!userId || !HigH_Sc0rE || !/(1|2|3|4|5)/.test(HigH_Sc0rE)) {
+    return next(new AppError("Cant update highscore!", 400));
+  }
+
+  const pool = await dbClient.getConnection(config.sql);
+  console.log(usersQueries.updateHighscoreQuery({ userId, HigH_Sc0rE }));
+  await pool
+    .request()
+    .query(usersQueries.updateHighscoreQuery({ userId, HigH_Sc0rE }));
+
+  res.status(201).json({
+    status: "success",
+    data: HigH_Sc0rE,
+  });
+});
 const updateMe = catchAsync(async (req, res, next) => {
   if (req.body.password || req.body.newPassword) {
     return next(new AppError("This route is not for password updates!", 400));
@@ -174,5 +190,6 @@ module.exports = {
   getMe,
   updateMe,
   onActivateMe,
+  updateHighscore,
   onDeActivateMe,
 };

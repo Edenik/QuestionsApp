@@ -19,7 +19,6 @@ export class GameService {
   }>();
 
   getRandomQuestions(difficulity: Difficulity) {
-    console.log(this.authService.getUser());
     const queryParams = `?difficulity=${difficulity}`;
     this.http
       .get<{ status: string; total: number; data: { questions: Question[] } }>(
@@ -32,6 +31,24 @@ export class GameService {
           total: questionsData.total,
         });
       });
+  }
+
+  checkAnswer(question: number, answer: number) {
+    const queryParams = `?question=${question}&answer=${answer}`;
+    return this.http.get<{ status: string; correct: Boolean }>(
+      `${environment.apiUrl}/questions/check${queryParams}`
+    );
+  }
+
+  updateHighscore(userId: number, HigH_Sc0rE: number) {
+    const body = {
+      userId,
+      HigH_Sc0rE,
+    };
+    return this.http.patch<{ status: string; data: number }>(
+      `${environment.apiUrl}/users/me/updateHighscore`,
+      body
+    );
   }
 
   getQuestionUpdateListener() {

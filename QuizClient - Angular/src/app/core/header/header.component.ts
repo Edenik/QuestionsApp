@@ -1,6 +1,6 @@
 import { EventEmitter } from '@angular/core';
 import { Component, OnDestroy, OnInit, Output } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { User } from 'src/app/modules/admin/users/users-list/user.model';
 import { AuthService } from 'src/app/modules/auth/auth.service';
@@ -16,9 +16,17 @@ export class HeaderComponent implements OnInit, OnDestroy {
   public role: string = 'user';
   @Output() user: User;
   public theme: string = 'blue-theme';
+  public url: string;
 
   @Output() themeChanged = new EventEmitter();
-  constructor(private authService: AuthService, public router: Router) {}
+  constructor(private authService: AuthService, public router: Router) {
+    router.events.subscribe((event: NavigationEnd) => {
+      if (event instanceof NavigationEnd) {
+        this.url = event.url;
+        console.log(this.url);
+      }
+    });
+  }
 
   onChangeEvent(event): void {
     this.theme = event.value;

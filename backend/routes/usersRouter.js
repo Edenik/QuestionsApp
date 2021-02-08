@@ -16,6 +16,10 @@ router
   .patch(protectRoutesMiddle.protect, usersController.updateMe);
 
 router
+  .route("/me/updateHighscore")
+  .patch(protectRoutesMiddle.protect, usersController.updateHighscore);
+
+router
   .route("/me/updatePassword")
   .patch(protectRoutesMiddle.protect, authController.updatePassword);
 

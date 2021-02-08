@@ -1,4 +1,5 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { CountdownComponent, CountdownConfig } from 'ngx-countdown';
 import { Subscription } from 'rxjs';
 import { Difficulity, GameStatus } from 'src/app/core/models/enums.model';
 import { Question } from 'src/app/modules/admin/questions/question.model';
@@ -13,23 +14,35 @@ import { GameService } from '../game.service';
   styleUrls: ['./game.component.scss'],
 })
 export class GameComponent implements OnInit, OnDestroy {
+  @ViewChild('cd', { static: false }) private countdown: CountdownComponent;
+  private authListenerSubs: Subscription;
+
+  public countdownConfig: CountdownConfig = { leftTime: 10, format: 'ss:SS' };
   public questions: Question[] = [];
   public isLoading: boolean = false;
   public totalQuestions: number = 0;
   private questionsSub: Subscription = new Subscription();
   public difficulity: Difficulity = Difficulity.easy;
   public userIsAuthenticated: boolean = false;
-  private authListenerSubs: Subscription;
   public gameStatus: GameStatus = GameStatus.awiating;
   public score: number = 0;
+  public highscore: number = 0;
   public questionIndex = 0;
-
+  public answerChecked: boolean = false;
+  public message: string;
   public showConfetti: boolean = false;
   options: Array<{ value: Difficulity; viewValue: string }> = [
     { value: Difficulity.easy, viewValue: 'Easy' },
     { value: Difficulity.medium, viewValue: 'Medium' },
     { value: Difficulity.hard, viewValue: 'Hard' },
   ];
+
+  answers: Array<{ value: number }> = [
+    { value: 1 },
+    { value: 2 },
+    { value: 3 },
+  ];
+  public answer: number;
   user: User;
 
   constructor(
@@ -39,8 +52,19 @@ export class GameComponent implements OnInit, OnDestroy {
     this.getUser();
   }
 
+  handleEvent(event: { action: string; left: number; status: number }) {
+    console.log(event.status);
+    if (event.action === 'done') {
+      this.checkAnswer();
+    }
+  }
+
   onChangeDifficulity(difficulity) {
     this.difficulity = difficulity;
+  }
+
+  onChooseAnswer(answer) {
+    this.answer = answer;
   }
 
   getUser() {
@@ -51,8 +75,31 @@ export class GameComponent implements OnInit, OnDestroy {
       .getAuthStatusListener()
       .subscribe((isAuthenticated) => {
         this.user = this.authService.getUser();
+        this.highscore = this.authService.getHighscore();
+
         this.userIsAuthenticated = isAuthenticated;
       });
+  }
+
+  checkAnswer() {
+    this.countdown.stop();
+
+    if (!this.answer) {
+      this.answerChecked = true;
+      this.message = 'No more time...';
+    } else {
+      this.gameService
+        .checkAnswer(this.questions[this.questionIndex].id, this.answer)
+        .subscribe((response: { status: string; correct: Boolean }) => {
+          if (response.correct === true) {
+            this.score++;
+            this.message = 'Correct!';
+          } else {
+            this.message = 'Inorrect!';
+          }
+          this.answerChecked = true;
+        });
+    }
   }
 
   startGame() {
@@ -67,18 +114,40 @@ export class GameComponent implements OnInit, OnDestroy {
       });
   }
 
-  next() {
-    console.error(this.questionIndex);
+  nextQuestion() {
     if (this.questionIndex + 1 < 5) {
       this.questionIndex++;
-      this.score++;
+      this.countdown.restart();
     } else {
+      if (this.highscore < this.score) {
+        //update score
+        this.showConfetti = true;
+        this.highscore = this.score;
+        this.message = 'New highscore, Well done!';
+        this.authService
+          .updateHighscore(this.user.id, this.score)
+          .subscribe((res) => {
+            console.log(res);
+          });
+      } else {
+        if (this.score === 0) {
+          this.message = 'Bad job';
+        } else if (this.score < 0 && this.score > 3) {
+          this.message = 'You can get better';
+        } else {
+          this.message = 'Great job';
+        }
+      }
+
       this.gameStatus = GameStatus.end;
-      this.showConfetti = true;
     }
+    this.answerChecked = false;
+    this.answer = null;
   }
 
   restart() {
+    this.score = 0;
+    this.message = null;
     this.questionIndex = 0;
     this.gameStatus = GameStatus.awiating;
     this.showConfetti = false;

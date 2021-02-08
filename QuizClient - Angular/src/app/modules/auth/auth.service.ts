@@ -160,6 +160,23 @@ export class AuthService {
     this.cookieService.delete('quizAppRole');
   }
 
+  updateHighscore(userId: number, HigH_Sc0rE: number) {
+    const body = {
+      userId,
+      HigH_Sc0rE,
+    };
+    this.user.highscore = HigH_Sc0rE;
+    this.authStatusListener.next(true);
+    return this.http.patch<{ status: string; data: number }>(
+      `${environment.apiUrl}/users/me/updateHighscore`,
+      body
+    );
+  }
+
+  public getHighscore(): number {
+    return this.user.highscore;
+  }
+
   private getAuthData(): { token: string; expirationDate: Date; role: string } {
     const token = this.cookieService.get('quizAppToken');
     const expirationDate = this.cookieService.get('quizAppExpiration');

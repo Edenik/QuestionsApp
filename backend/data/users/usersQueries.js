@@ -170,6 +170,11 @@ const updateUserEmailAndNameQuery = (user) => `UPDATE [${
                                   } = '${user.getUsername()}' 
                                   WHERE _ID = ${user.getId()}`;
 
+const updateHighscoreQuery = ({ userId, HigH_Sc0rE }) =>
+  ` UPDATE [${config.sql.database}].[dbo].[${UsersTable.TABLE_NAME}]
+                                  SET
+                                  ${UsersTable.COL_HIGHSCORE} = '${HigH_Sc0rE}'                     
+                                  WHERE _ID = ${userId}`;
 const activateUserQuery = (
   activate,
   id
@@ -204,4 +209,5 @@ module.exports = {
   updateUserEmailAndNameQuery,
   activateUserQuery,
   getUserHighScores,
+  updateHighscoreQuery,
 };
