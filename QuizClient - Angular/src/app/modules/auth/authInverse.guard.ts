@@ -24,6 +24,6 @@ export class AuthInverseGuard implements CanActivate {
     if (isAuth) {
       this.router.navigate(['/']);
     }
-    return isAuth;
+    return !isAuth;
   }
 }
