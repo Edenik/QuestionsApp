@@ -40,17 +40,6 @@ export class GameService {
     );
   }
 
-  updateHighscore(userId: number, HigH_Sc0rE: number) {
-    const body = {
-      userId,
-      HigH_Sc0rE,
-    };
-    return this.http.patch<{ status: string; data: number }>(
-      `${environment.apiUrl}/users/me/updateHighscore`,
-      body
-    );
-  }
-
   getQuestionUpdateListener() {
     return this.questionsUpdated.asObservable();
   }

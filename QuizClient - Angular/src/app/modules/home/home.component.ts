@@ -29,10 +29,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.authListenerSubs = this.authService.getAuthStatusListener().subscribe(
       (isAuthenticated) => {
-        console.log('is auth' + isAuthenticated);
         this.user = this.authService.getUser();
-        // this.userME = this.user;
-        console.log(this.user);
         this.userIsAuthenticated = isAuthenticated;
         this.isLoading = false;
       },

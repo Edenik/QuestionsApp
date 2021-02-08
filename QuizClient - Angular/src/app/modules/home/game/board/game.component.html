@@ -1,4 +1,5 @@
 <div id="game-container" *ngIf="userIsAuthenticated && user?.active">
+
   <div class="circles-stop" *ngIf="gameStatus.toString() === 'awaiting'">
     <div class="game-card">
       <div class="game-card-body">
@@ -30,10 +31,10 @@
   </div>
 
   <div class="circles" *ngIf="gameStatus.toString() === 'start'">
-
     <div class="game-card">
       <div class="game-card-body">
-        <p class="game-card-text">Question: <strong class="mr-10">{{questionIndex+1}}</strong> Score:
+        <p class="game-card-text">Question: <strong>{{questionIndex+1}}</strong> |
+          <span>Score: </span>
           <strong>{{score}}</strong>
         </p>
 
@@ -91,7 +92,7 @@
         <p class="game-card-text">{{message}}</p>
 
         <p class="game-card-text mt-15">
-          <button mat-raised-button color="primary" (click)="restart()">Check!</button>
+          <button mat-raised-button color="primary" (click)="restart()">Restart</button>
         </p>
 
       </div>

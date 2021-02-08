@@ -23,7 +23,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     router.events.subscribe((event: NavigationEnd) => {
       if (event instanceof NavigationEnd) {
         this.url = event.url;
-        console.log(this.url);
       }
     });
   }
@@ -43,16 +42,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.role = this.authService.getRole() || 'user';
 
     this.theme = localStorage.getItem('quiz-app-theme');
-    console.error(this.theme);
 
-    console.log(this.theme);
     this.authListenerSubs = this.authService
       .getAuthStatusListener()
       .subscribe((isAuthenticated) => {
-        console.log('auth status from header ' + isAuthenticated);
         this.userIsAuthenticated = isAuthenticated;
         this.user = this.authService.getUser();
-        console.log(this.user);
         this.role = this.authService.getRole() || 'user';
       });
   }

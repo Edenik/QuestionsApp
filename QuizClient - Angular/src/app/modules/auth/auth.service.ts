@@ -97,7 +97,6 @@ export class AuthService {
       .subscribe(
         (response) => {
           this.user = response.data.user;
-          console.log(this.user);
           if (this.user) {
             this.user = response.data.user;
             this.role = response.data.user.role;
