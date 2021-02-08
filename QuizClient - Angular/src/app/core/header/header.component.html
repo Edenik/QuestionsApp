@@ -1,12 +1,12 @@
 <mat-toolbar color='primary'>
-  <span><a routerLink="">Quiz App</a></span>
-
   <span class="spacer"></span>
+  <span><a (click)="router.navigate([''])">Quiz App</a></span>
+  <span class="flex-spacer"></span>
 
 
   <ul>
     <li *ngIf="userIsAuthenticated && role === 'admin'">
-      <a mat-button routerLink="/admin/questions" routerLinkActive="mat-warn">Questions</a>
+      <a mat-button routerLink="/admin/" routerLinkActive="mat-warn">Questions</a>
     </li>
     <li *ngIf="userIsAuthenticated && role === 'admin'">
       <a mat-button routerLink="/admin/create" routerLinkActive="mat-warn">New Question</a>
@@ -18,33 +18,27 @@
       <a mat-button routerLink="/auth/signup" routerLinkActive="mat-warn">Signup</a>
     </li>
 
-
-
-    <!-- <button mat-raised-button color="primary" (click)="onSetTheme('red-theme')">Default</button>
-    <button mat-raised-button color="primary" (click)="onSetTheme('blue-theme')">Dark</button> -->
-
     <li *ngIf="userIsAuthenticated">
       <button mat-button (click)="onLogout()">Logout</button>
     </li>
 
-
-
-
-
-
-
   </ul>
-  <span class="spacer"></span>
+  <span class="flex-spacer"></span>
 
   <ul>
     <li>
-      Blue
 
 
-      <mat-slide-toggle (change)="onChangeEvent($event)">
-      </mat-slide-toggle>
-      Red
+
+      <mat-button-toggle-group appearance="legacy" [value]='theme' (change)="onChangeEvent($event)">
+        <mat-button-toggle value="blue-theme">Blue</mat-button-toggle>
+        <mat-button-toggle value="red-theme">Red</mat-button-toggle>
+      </mat-button-toggle-group>
+
+
 
     </li>
   </ul>
+  <span class="spacer"></span>
+
 </mat-toolbar>

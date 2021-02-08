@@ -1,17 +1,74 @@
-<div id="game-container">
-  <div class="holder">
-    <div class="card">
-      <div class="card-body">
-        Quiz App
-        <br />
-        <small></small>
+<div id="game-container" *ngIf="userIsAuthenticated && user?.active">
+  <div class="circles-stop" *ngIf="gameStatus.toString() === 'awaiting'">
+    <div class="game-card">
+      <div class="game-card-body">
+        <p class="game-card-text game-card-title">Welcome 👋</p>
+
+        <p class="game-card-text mt-15 mb-15"> <strong>{{user.username}}</strong></p>
+        <p class="game-card-text">Highscore: <strong>{{user.highscore}}</strong></p>
+
+
+        <div class="selector">
+          <mat-form-field appearance="fill" style="width: 80%;">
+            <mat-label>Difficulity</mat-label>
+            <mat-select [value]="difficulity" (valueChange)="onChangeDifficulity($event)">
+              <mat-option *ngFor="let option of options" [value]="option.value">
+                {{option.viewValue}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+
+        <p class="game-card-text mt-15">
+          <button mat-raised-button color="primary" (click)="startGame()">PLAY!</button>
+        </p>
+
       </div>
 
     </div>
   </div>
+
+  <div class="circles" *ngIf="gameStatus.toString() === 'start'">
+
+    <div class="game-card">
+      <div class="game-card-body">
+        <p class="game-card-text">Score: <strong>{{score}}</strong></p>
+
+        <p class="game-card-text mt-15 mb-15"> <strong>{{questionIndex+1}})
+            {{questions[questionIndex].question}}</strong>
+        </p>
+
+
+        <p class="game-card-text mt-15">
+          <button mat-raised-button color="primary" (click)="next()">Check!</button>
+        </p>
+
+      </div>
+
+    </div>
+  </div>
+
+  <div class="circles-stop" *ngIf="gameStatus.toString() === 'end'">
+    <div class="game-card">
+      <div class="game-card-body">
+        <p class="game-card-text">Score: <strong>{{score}}</strong></p>
+        <p class="game-card-text">GOOD GAME!</p>
+
+        <!-- <p class="game-card-text mt-15 mb-15"> <strong>{{questionIndex+1}})
+            {{questions[questionIndex].question}}</strong>
+        </p> -->
+
+        <p class="game-card-text mt-15">
+          <button mat-raised-button color="primary" (click)="restart()">Check!</button>
+        </p>
+
+      </div>
+    </div>
+
+  </div>
+
 </div>
 
 
-
-
-<!-- <app-celebrate *ngIf="showConfetti === true"></app-celebrate> -->
+<app-celebrate *ngIf="showConfetti"></app-celebrate>

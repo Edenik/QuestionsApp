@@ -15,7 +15,8 @@ const getCurrentUser = async ({ id, getPassword, next }) => {
     const currentUser = await pool
       .request()
       .query(usersQueries.getUserDetailsWithOrWithoutPassword(getPassword, id))
-      .catch(() => {
+      .catch((err) => {
+        console.log(err);
         next(new AppError("Error with DB! (No data or connection error)"));
       });
 

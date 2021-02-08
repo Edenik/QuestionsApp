@@ -79,7 +79,7 @@ export class AuthService {
               now.getTime() + expiresInDuration * 1000
             );
             this.saveAuthData(this.token, expirationDate, this.user.role);
-            this.router.navigate(['/']);
+            this.router.navigate(['/game']);
           }
         },
         (err) => {
@@ -88,7 +88,29 @@ export class AuthService {
       );
   }
 
-  public autoAuthUser(): void {
+  public getCurrentUser() {
+    this.http
+      .get<{
+        status: string;
+        data: { user: User };
+      }>(`${environment.apiUrl}/users/me`)
+      .subscribe(
+        (response) => {
+          this.user = response.data.user;
+          console.log(this.user);
+          if (this.user) {
+            this.user = response.data.user;
+            this.role = response.data.user.role;
+            this.authStatusListener.next(true);
+          }
+        },
+        (err) => {
+          this.authStatusListener.next(false);
+        }
+      );
+  }
+
+  public async autoAuthUser() {
     const authInformation = this.getAuthData();
     if (!authInformation) {
       return;
@@ -99,6 +121,7 @@ export class AuthService {
       this.token = authInformation.token;
       this.isAuthenticated = true;
       this.role = authInformation.role;
+      await this.getCurrentUser();
       this.setAuthTimer(expiresIn / 1000);
       this.authStatusListener.next(true);
     }
@@ -108,10 +131,10 @@ export class AuthService {
     this.token = null;
     this.isAuthenticated = false;
     this.authStatusListener.next(false);
-    clearTimeout(this.tokenTimer);
-    this.clearAuthData();
     this.user = null;
     this.role = null;
+    this.clearAuthData();
+    clearTimeout(this.tokenTimer);
     this.router.navigate(['/']);
   }
 

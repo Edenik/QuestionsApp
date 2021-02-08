@@ -1,15 +1,23 @@
-<app-game *ngIf="userIsAuthenticated"></app-game>
+<!-- <app-game *ngIf="!isLoading && userIsAuthenticated && user && user.active"></app-game> -->
 
-<div id="home-container" *ngIf="!userIsAuthenticated">
-  <div class="holder">
-    <div class="card">
-      <div class="card-body">
-        <span class="card-title">Quiz App</span>
 
-        <span class="card-text">Hello</span>
-        <span class="card-text">Hello</span>
-        <span class="card-text">Hello</span>
-        <span class="card-text">Hello</span>
+<div id="home-container">
+  <div id="circles">
+    <div class="home-card">
+      <div class="home-card-body">
+        <p class="home-card-title home-card-text">Welcome 👋</p>
+
+        <p class="home-card-text mt-15 mb-15"><strong>Quiz App</strong></p>
+        <p class="home-card-text mt-5">Simply the best place to test your knowledge.</p>
+
+        <p class="home-card-text  mt-5">
+          <a *ngIf="!userIsAuthenticated" mat-raised-button routerLink="/auth/login" color="primary">Login</a>
+          <a *ngIf="userIsAuthenticated" mat-raised-button routerLink="/game" color="primary">Go to Game</a>
+        </p>
+
+
+
+
       </div>
 
     </div>

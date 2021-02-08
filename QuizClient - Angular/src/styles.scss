@@ -7,6 +7,18 @@
   padding: 0;
 }
 
+.mat-button-toggle {
+  height: 30px !important;
+  position: relative !important;
+}
+.mat-button-toggle-label-content {
+  font-size: 14px !important;
+  margin: 0 !important;
+  top: 0% !important;
+  -ms-transform: translateY(-2%) !important;
+  transform: translateY(-2%) !important;
+}
+
 html,
 body {
   height: 100%;
@@ -21,6 +33,38 @@ body {
   min-height: 100vh;
   margin: 0 auto;
   position: relative;
+}
+
+.mt-5 {
+  margin-top: 5px !important;
+}
+
+.mb-5 {
+  margin-bottom: 5px !important;
+}
+
+.mt-10 {
+  margin-top: 10px !important;
+}
+
+.mb-10 {
+  margin-bottom: 10px !important;
+}
+
+.mt-15 {
+  margin-top: 15px !important;
+}
+
+.mb-15 {
+  margin-bottom: 15px !important;
+}
+
+.mt-30 {
+  margin-top: 30px !important;
+}
+
+.mb-15 {
+  margin-bottom: 30px !important;
 }
 
 .info-text {
@@ -76,6 +120,20 @@ $custom-typography: mat-typography-config(
 );
 
 @include mat-core($custom-typography);
+
+.mat-button-toggle {
+  background-color: #0d242f !important;
+  .mat-button-toggle-label-content {
+    color: #ffffff;
+  }
+}
+
+.mat-button-toggle-checked {
+  background-color: #ffffff !important;
+  .mat-button-toggle-label-content {
+    color: #0d242f;
+  }
+}
 
 .red-theme {
   @include angular-material-theme($quiz-red-theme);

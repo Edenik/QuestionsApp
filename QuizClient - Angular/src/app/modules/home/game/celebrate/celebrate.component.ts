@@ -1,4 +1,3 @@
-import { isPlatformBrowser } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -10,7 +9,6 @@ import {
   Renderer2,
 } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 import { CelebrateService } from 'src/app/modules/home/game/celebrate/celebrate.service';
 
 @Component({
@@ -29,7 +27,6 @@ export class CelebrateComponent implements OnInit, OnDestroy {
   destroy$ = this.destroy.asObservable();
 
   constructor(
-    @Inject(PLATFORM_ID) private platformID: Object,
     private renderer2: Renderer2,
     private celebrateService: CelebrateService,
     private elementRef: ElementRef
@@ -37,17 +34,7 @@ export class CelebrateComponent implements OnInit, OnDestroy {
     this.celebrate$ = this.celebrateService.celebrate$;
   }
   ngOnInit(): void {
-    // this.celebrate$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-
-    //   this.celebrate();
-    // });
-    // if (isPlatformBrowser(this.platformID)) {
-    //   this.celebrate$
-    //     .pipe(takeUntil(this.destroy$))
-    //     .subscribe(() => this.celebrate());
-
     this.celebrate();
-    // }
   }
   ngOnDestroy(): void {
     this.destroy.next();
@@ -71,7 +58,7 @@ export class CelebrateComponent implements OnInit, OnDestroy {
         this.confettiCanvas = this.confettiLib.create(this.canvas, {
           resize: true,
         });
-        const end = Date.now() + 5 * 1000; // set the end time
+        const end = Date.now() + 10 * 1000; // set the end time
         const interval = setInterval(() => {
           if (Date.now() > end) {
             clearInterval(interval);

@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { Mode } from 'src/app/core/models/enums.model';
+import { EditQuestionMode } from 'src/app/core/models/enums.model';
 import { Question } from 'src/app/modules/admin/questions/question.model';
 import { AuthService } from 'src/app/modules/auth/auth.service';
 import { QuestionsService } from 'src/app/modules/admin/questions/questions.service';
@@ -13,7 +13,7 @@ import { QuestionsService } from 'src/app/modules/admin/questions/questions.serv
   styleUrls: ['./create-question.component.scss'],
 })
 export class CreateQuestionComponent implements OnInit, OnDestroy {
-  private mode: Mode = Mode.create;
+  private mode: EditQuestionMode = EditQuestionMode.create;
   private questionId: number = null;
   private authStatusSub: Subscription;
   form: FormGroup;
@@ -31,7 +31,7 @@ export class CreateQuestionComponent implements OnInit, OnDestroy {
     if (this.form.invalid) return;
 
     this.isLoading = true;
-    if (this.mode === Mode.create) {
+    if (this.mode === EditQuestionMode.create) {
       this.questionsService.addQuestion(
         this.form.value.question,
         this.form.value.option1,
@@ -92,7 +92,7 @@ export class CreateQuestionComponent implements OnInit, OnDestroy {
       difficulity: new FormControl(null, {
         validators: [
           Validators.required,
-          Validators.pattern(/^easy|medium|high^/),
+          Validators.pattern(/(easy|medium|hard)/),
         ],
       }),
     });
@@ -109,7 +109,7 @@ export class CreateQuestionComponent implements OnInit, OnDestroy {
 
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
       if (paramMap.has('id')) {
-        this.mode = Mode.edit;
+        this.mode = EditQuestionMode.edit;
         this.questionId = parseInt(paramMap.get('id'));
         this.isLoading = true;
         this.questionsService
@@ -144,7 +144,7 @@ export class CreateQuestionComponent implements OnInit, OnDestroy {
             });
           });
       } else {
-        this.mode = Mode.create;
+        this.mode = EditQuestionMode.create;
         this.questionId = null;
       }
     });

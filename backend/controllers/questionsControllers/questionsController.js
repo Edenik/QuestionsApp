@@ -10,9 +10,9 @@ const AppError = require("../../utils/appError");
 const getQuestionsWithDifficulity = catchAsync(async (req, res, next) => {
   const difficulity = req.query.difficulity;
 
-  if (difficulity == undefined || !/(easy|medium|high)/.test(difficulity)) {
+  if (difficulity == undefined || !/(easy|medium|hard)/.test(difficulity)) {
     return next(
-      new AppError("Add difficulity as query: difficulity?=easy|medium|high")
+      new AppError("Add difficulity as query: difficulity?=easy|medium|hard")
     );
   }
 

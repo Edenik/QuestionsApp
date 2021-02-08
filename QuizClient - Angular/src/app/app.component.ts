@@ -21,8 +21,11 @@ export class AppComponent implements OnInit {
 
   getTheme(): void {
     const theme = localStorage.getItem('quiz-app-theme');
-    if (theme === 'blue-theme') {
+    if (theme === 'blue-theme' || theme === 'red-theme') {
       this.addThemeClass(theme);
+    } else {
+      this.setTheme('blue-theme');
+      this.addThemeClass('blue-theme');
     }
   }
 

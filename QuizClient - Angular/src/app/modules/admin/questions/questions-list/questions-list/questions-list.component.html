@@ -13,7 +13,7 @@
     <p>Correct Answer: {{question.correctAnswer}}</p>
 
     <mat-action-row>
-      <a mat-raised-button color="primary" [routerLink]="['/edit', question.id]">Edit</a>
+      <a mat-raised-button color="primary" [routerLink]="['/admin/edit', question.id]">Edit</a>
       <button mat-raised-button color="warn" (click)="onDelete(question.id)">Delete</button>
     </mat-action-row>
 

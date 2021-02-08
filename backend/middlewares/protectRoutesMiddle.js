@@ -53,6 +53,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     .request()
     .query(getUserQuery)
     .catch((err) => {
+      console.log(err);
       next(new AppError("Error with DB! (No data or connection error)", 500));
     });
 
