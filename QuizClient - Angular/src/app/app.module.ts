@@ -10,21 +10,11 @@ import { MaterialModule } from './core/modules/material.module';
 import { HomeComponent } from './modules/home/home.component';
 import { AppComponent } from './app.component';
 import { OverlayModule } from '@angular/cdk/overlay';
-import { GameComponent } from './modules/home/game/board/game.component';
-import { CelebrateComponent } from './modules/home/game/celebrate/celebrate.component';
 import { HeaderComponent } from './core/header/header.component';
 import { ErrorComponent } from './core/error/error.component';
-import { CountdownModule } from 'ngx-countdown';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    GameComponent,
-    CelebrateComponent,
-    HeaderComponent,
-    HomeComponent,
-    ErrorComponent,
-  ],
+  declarations: [AppComponent, HeaderComponent, HomeComponent, ErrorComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -32,7 +22,6 @@ import { CountdownModule } from 'ngx-countdown';
     HttpClientModule,
     MaterialModule,
     OverlayModule,
-    CountdownModule,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

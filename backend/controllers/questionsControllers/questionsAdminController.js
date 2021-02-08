@@ -39,7 +39,7 @@ const getQuestion = catchAsync(async (req, res, next) => {
 
   const question = await pool
     .request()
-    .query(questionsQueries.selectQuestionWhereIdQuery(req.params.id));
+    .query(questionsQueries.selectQuestionWhereIdQuery(req.params.questionID));
 
   if (question.recordsets[0].length == 0) {
     return next(new AppError("No question found with that id"));
@@ -119,8 +119,6 @@ const createQuestion = async (question) => {
 };
 
 const onUpdate = catchAsync(async (req, res, next) => {
-  const pool = await dbClient.getConnection(config.sql);
-
   const questionOBJ = { ...req.questionOBJ };
   const newQuestion = new Question(
     questionOBJ.question,
@@ -132,6 +130,7 @@ const onUpdate = catchAsync(async (req, res, next) => {
     questionOBJ.id
   );
 
+  const pool = await dbClient.getConnection(config.sql);
   await pool.request().query(questionsQueries.updateQuestionQuery(newQuestion));
 
   res.status(201).json({
@@ -147,7 +146,7 @@ const onDelete = catchAsync(async (req, res, next) => {
 
   const deleteRes = await pool
     .request()
-    .query(questionsQueries.deleteQuestionQuery(req.params.id));
+    .query(questionsQueries.deleteQuestionQuery(req.params.questionID));
 
   if (deleteRes.rowsAffected[0] == 0) {
     return next(new AppError("No question found to delete."));

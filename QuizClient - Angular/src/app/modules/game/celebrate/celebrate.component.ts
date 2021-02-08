@@ -2,14 +2,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  Inject,
   OnDestroy,
   OnInit,
-  PLATFORM_ID,
   Renderer2,
 } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { CelebrateService } from 'src/app/modules/home/game/celebrate/celebrate.service';
+import { CelebrateService } from './celebrate.service';
 
 @Component({
   selector: 'app-celebrate',

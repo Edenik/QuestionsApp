@@ -59,29 +59,29 @@ export class CreateQuestionComponent implements OnInit, OnDestroy {
       question: new FormControl(null, {
         validators: [
           Validators.required,
-          Validators.minLength(20),
-          Validators.maxLength(150),
+          Validators.minLength(5),
+          Validators.maxLength(100),
         ],
       }),
       option1: new FormControl(null, {
         validators: [
           Validators.required,
-          Validators.minLength(5),
-          Validators.maxLength(100),
+          Validators.minLength(1),
+          Validators.maxLength(20),
         ],
       }),
       option2: new FormControl(null, {
         validators: [
           Validators.required,
-          Validators.minLength(5),
-          Validators.maxLength(100),
+          Validators.minLength(1),
+          Validators.maxLength(20),
         ],
       }),
       option3: new FormControl(null, {
         validators: [
           Validators.required,
-          Validators.minLength(5),
-          Validators.maxLength(100),
+          Validators.minLength(1),
+          Validators.maxLength(20),
         ],
       }),
 
@@ -112,12 +112,12 @@ export class CreateQuestionComponent implements OnInit, OnDestroy {
         this.mode = EditQuestionMode.edit;
         this.questionId = parseInt(paramMap.get('id'));
         this.isLoading = true;
+        console.error(this.questionId);
         this.questionsService
           .getQuestion(this.questionId)
           .subscribe((questionData) => {
             this.isLoading = false;
             const {
-              id,
               question,
               option1,
               option2,
@@ -125,8 +125,9 @@ export class CreateQuestionComponent implements OnInit, OnDestroy {
               difficulity,
               correctAnswer,
             } = questionData.data.question[0];
+
             this.questionOBJ = {
-              id,
+              id: this.questionId,
               question,
               option1,
               option2,

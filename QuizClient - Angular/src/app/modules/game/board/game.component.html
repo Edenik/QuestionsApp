@@ -1,6 +1,6 @@
 <div id="game-container" *ngIf="userIsAuthenticated && user?.active">
 
-  <div class="circles-stop" *ngIf="gameStatus.toString() === 'awaiting'">
+  <div class="circles-stop" *ngIf="game.gameStatus.toString() === 'awaiting'">
     <div class="game-card">
       <div class="game-card-body">
         <p class="game-card-text game-card-title">Welcome 👋</p>
@@ -12,8 +12,8 @@
         <div class="selector">
           <mat-form-field appearance="fill" style="width: 80%;">
             <mat-label>Difficulity</mat-label>
-            <mat-select [value]="difficulity" (valueChange)="onChangeDifficulity($event)">
-              <mat-option *ngFor="let option of options" [value]="option.value">
+            <mat-select [value]="game.difficulity" (valueChange)="onChangeDifficulity($event)">
+              <mat-option *ngFor="let option of game.options" [value]="option.value">
                 {{option.viewValue}}
               </mat-option>
             </mat-select>
@@ -30,43 +30,43 @@
     </div>
   </div>
 
-  <div class="circles" *ngIf="gameStatus.toString() === 'start'">
+  <div class="circles" *ngIf="game.gameStatus.toString() === 'start'">
     <div class="game-card">
       <div class="game-card-body">
-        <p class="game-card-text">Question: <strong>{{questionIndex+1}}</strong> |
+        <p class="game-card-text">Question: <strong>{{game.questionIndex+1}}</strong> |
           <span>Score: </span>
-          <strong>{{score}}</strong>
+          <strong>{{game.score}}</strong>
         </p>
 
         <p class="game-card-text">
-          <countdown #cd [config]="countdownConfig" (event)="handleEvent($event)"></countdown>
+          <countdown #cd [config]="game.countdownConfig" (event)="handleEvent($event)"></countdown>
         </p>
 
         <p class="game-card-question mt-5 mb-5"> <strong>
-            {{questions[questionIndex].question}}</strong>
+            {{game.questions[game.questionIndex].question}}</strong>
         </p>
 
         <p class="game-card-question mt-5 mb-5"> <strong class="mr-10">1)</strong>
-          {{questions[questionIndex].option1}}
+          {{game.questions[game.questionIndex].option1}}
         </p>
 
         <p class="game-card-question mt-5 mb-5"> <strong class="mr-10">2)</strong>
-          {{questions[questionIndex].option2}}
+          {{game.questions[game.questionIndex].option2}}
         </p>
 
         <p class="game-card-question mt-5 mb-5"> <strong class="mr-10">3)</strong>
-          {{questions[questionIndex].option3}}
+          {{game.questions[game.questionIndex].option3}}
         </p>
 
-        <p class="game-card-message" *ngIf="answerChecked"> <strong> {{message}}</strong>
+        <p class="game-card-message" *ngIf="game.answerChecked"> <strong> {{game.message}}</strong>
         </p>
 
 
-        <div class="selector" *ngIf="!answerChecked">
+        <div class="selector" *ngIf="!game.answerChecked">
           <mat-form-field appearance="fill" style="width: 80%;">
             <mat-label>Choose</mat-label>
-            <mat-select [value]="answer" (valueChange)="onChooseAnswer($event)">
-              <mat-option *ngFor="let answer of answers" [value]="answer.value">
+            <mat-select [value]="game.answer" (valueChange)="onChooseAnswer($event)">
+              <mat-option *ngFor="let answer of game.answers" [value]="answer.value">
                 {{answer.value}}
               </mat-option>
             </mat-select>
@@ -77,19 +77,19 @@
 
 
       <p class="game-card-button mb-30">
-        <button mat-raised-button color="primary" *ngIf="!answerChecked" [disabled]="!answer"
+        <button mat-raised-button color="primary" *ngIf="!game.answerChecked" [disabled]="!game.answer"
           (click)="checkAnswer()">Check!</button>
-        <button mat-raised-button color="primary" *ngIf="answerChecked" (click)="nextQuestion()">Next!</button>
+        <button mat-raised-button color="primary" *ngIf="game.answerChecked" (click)="nextQuestion()">Next!</button>
       </p>
     </div>
 
   </div>
 
-  <div class="circles-stop" *ngIf="gameStatus.toString() === 'end'">
+  <div class="circles-stop" *ngIf="game.gameStatus.toString() === 'end'">
     <div class="game-card end-card">
       <div class="game-card-body">
-        <p class="game-card-text">Score: <strong>{{score}}</strong></p>
-        <p class="game-card-text">{{message}}</p>
+        <p class="game-card-text">Score: <strong>{{game.score}}</strong></p>
+        <p class="game-card-text">{{game.message}}</p>
 
         <p class="game-card-text mt-15">
           <button mat-raised-button color="primary" (click)="restart()">Restart</button>
@@ -103,4 +103,4 @@
 </div>
 
 
-<app-celebrate *ngIf="showConfetti"></app-celebrate>
+<app-celebrate *ngIf="game.showConfetti"></app-celebrate>

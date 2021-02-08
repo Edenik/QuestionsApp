@@ -27,7 +27,8 @@ const checkUserBodyForUpdate = (req, res, next) => {
     "username",
     "password",
     "role",
-    "highscore"
+    "highscore",
+    "id"
   );
   const errors = [];
   if (!/^[0-5]$/.test(filteredBody.highscore))
@@ -43,11 +44,11 @@ const checkUserBodyForUpdate = (req, res, next) => {
     filteredBody.username,
     filteredBody.password,
     "user",
-    req.params.id,
+    filteredBody.id,
     filteredBody.highscore
   );
 
-  if (req.params.id !== undefined) req.userOBJ.setId(req.params.id * 1);
+  if (req.params.id) req.userOBJ.setId(req.params.id * 1);
   next();
 };
 
@@ -61,7 +62,6 @@ const checkQuestionBody = (req, res, next) => {
     "difficulity",
     "correctAnswer"
   );
-
   const errors = [];
   if (!filteredBody.question) errors.push("Please provide question!");
   if (!filteredBody.option1) errors.push("Please provide option1!");
@@ -76,9 +76,11 @@ const checkQuestionBody = (req, res, next) => {
     filteredBody.option2,
     filteredBody.option3,
     filteredBody.difficulity,
-    filteredBody.correctAnswer
+    filteredBody.correctAnswer,
+    req.params.questionID
   );
-  if (req.params.id !== undefined) req.questionOBJ.setId(req.params.id);
+
+  if (!req.body.id) req.questionOBJ.setId(req.params.id);
   next();
 };
 

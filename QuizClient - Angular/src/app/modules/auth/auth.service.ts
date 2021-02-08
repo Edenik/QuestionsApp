@@ -5,7 +5,7 @@ import { AuthData } from './auth-data.model';
 import { Subject } from 'rxjs';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
-import { User } from '../admin/users/users-list/user.model';
+import { User } from '../../core/models/user.model';
 
 @Injectable({
   providedIn: 'root',

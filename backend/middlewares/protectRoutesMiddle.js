@@ -53,7 +53,6 @@ exports.protect = catchAsync(async (req, res, next) => {
     .request()
     .query(getUserQuery)
     .catch((err) => {
-      console.log(err);
       next(new AppError("Error with DB! (No data or connection error)", 500));
     });
 
@@ -85,6 +84,7 @@ exports.protect = catchAsync(async (req, res, next) => {
       )
     );
   }
+  req.params.questionID = req.params.id;
   req.user = currentUser;
   req.params.id = currentUser.id;
   next();

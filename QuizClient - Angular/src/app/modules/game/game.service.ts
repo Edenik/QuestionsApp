@@ -3,9 +3,9 @@ import { Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
-import { Question } from '../../admin/questions/question.model';
+import { Question } from '../admin/questions/question.model';
 import { Difficulity } from 'src/app/core/models/enums.model';
-import { AuthService } from '../../auth/auth.service';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({
   providedIn: 'root',

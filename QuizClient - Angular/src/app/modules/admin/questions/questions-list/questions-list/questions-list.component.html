@@ -11,6 +11,7 @@
     <p>2) {{question.option2}}</p>
     <p>3) {{question.option3}}</p>
     <p>Correct Answer: {{question.correctAnswer}}</p>
+    <p>ID: {{ question.id}}</p>
 
     <mat-action-row>
       <a mat-raised-button color="primary" [routerLink]="['/admin/edit', question.id]">Edit</a>

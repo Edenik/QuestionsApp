@@ -63,7 +63,7 @@ export class QuestionsService {
         questionOBJ
       )
       .subscribe((responseData) => {
-        this.router.navigate(['/']);
+        this.router.navigate(['/admin']);
       });
   }
 
@@ -89,7 +89,7 @@ export class QuestionsService {
     this.http
       .put(`${environment.apiUrl}/questions/${id}`, questionOBJ)
       .subscribe(() => {
-        this.router.navigate(['/questions']);
+        this.router.navigate(['/admin']);
       });
   }
 

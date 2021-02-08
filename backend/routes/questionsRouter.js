@@ -6,10 +6,12 @@ const AppError = require("../utils/appError");
 const router = express.Router();
 const { checkQuestionBody } = require("../middlewares/checkReqBodyMiddle");
 
-router.route("/random").get(
-  // protectRoutesMiddle.protect,
-  questionsController.getQuestionsWithDifficulity
-);
+router
+  .route("/random")
+  .get(
+    protectRoutesMiddle.protect,
+    questionsController.getQuestionsWithDifficulity
+  );
 
 router
   .route("/check")
@@ -19,12 +21,12 @@ router
   .route("/")
   .get(
     protectRoutesMiddle.protect,
-    // protectRoutesMiddle.restrictTo("admin"),
+    protectRoutesMiddle.restrictTo("admin"),
     questionsAdminController.getQuestions
   )
   .post(
     protectRoutesMiddle.protect,
-    // protectRoutesMiddle.restrictTo("admin"),
+    protectRoutesMiddle.restrictTo("admin"),
     checkQuestionBody,
     questionsAdminController.onCreate
   );
@@ -33,18 +35,18 @@ router
   .route("/:id")
   .get(
     protectRoutesMiddle.protect,
-    // protectRoutesMiddle.restrictTo("admin"),
+    protectRoutesMiddle.restrictTo("admin"),
     questionsAdminController.getQuestion
   )
   .put(
     protectRoutesMiddle.protect,
-    // protectRoutesMiddle.restrictTo("admin"),
+    protectRoutesMiddle.restrictTo("admin"),
     checkQuestionBody,
     questionsAdminController.onUpdate
   )
   .delete(
     protectRoutesMiddle.protect,
-    // protectRoutesMiddle.restrictTo("admin"),
+    protectRoutesMiddle.restrictTo("admin"),
     questionsAdminController.onDelete
   );
 

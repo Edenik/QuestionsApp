@@ -3,24 +3,24 @@
   <form [formGroup]="form" (submit)="onSaveQuestion()" *ngIf="!isLoading">
     <mat-form-field>
       <textarea matInput rows="2" type="text" formControlName="question" placeholder="Question"></textarea>
-      <mat-error *ngIf="form.get('question').invalid">Please enter a question. (Min 20 chars, Max 150 chars)</mat-error>
+      <mat-error *ngIf="form.get('question').invalid">Please enter a question. (Min 5 chars, Max 100 chars)</mat-error>
     </mat-form-field>
 
     <mat-form-field>
       <input matInput type="text" formControlName="option1" placeholder="Option 1">
-      <mat-error *ngIf="form.get('option1').invalid">Please enter option 1 text. (Min 5 chars, Max 100 chars)
+      <mat-error *ngIf="form.get('option1').invalid">Please enter option 1 text. (Min 1 chars, Max 20 chars)
       </mat-error>
     </mat-form-field>
 
     <mat-form-field>
       <input matInput type="text" formControlName="option2" placeholder="Option 2">
-      <mat-error *ngIf="form.get('option2').invalid">Please enter option 2 text. (Min 5 chars, Max 100 chars)
+      <mat-error *ngIf="form.get('option2').invalid">Please enter option 2 text. (Min 1 chars, Max 20 chars)
       </mat-error>
     </mat-form-field>
 
     <mat-form-field>
       <input matInput type="text" formControlName="option3" placeholder="Option 3">
-      <mat-error *ngIf="form.get('option3').invalid">Please enter option 3 text. (Min 5 chars, Max 100 chars)
+      <mat-error *ngIf="form.get('option3').invalid">Please enter option 3 text. (Min 1 chars, Max 20 chars)
       </mat-error>
     </mat-form-field>
 

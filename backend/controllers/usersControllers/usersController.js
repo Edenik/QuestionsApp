@@ -15,7 +15,6 @@ const getCurrentUser = async ({ id, getPassword, next }) => {
       .request()
       .query(usersQueries.getUserDetailsWithOrWithoutPassword(getPassword, id))
       .catch((err) => {
-        console.log(err);
         next(new AppError("Error with DB! (No data or connection error)"));
       });
 
@@ -32,7 +31,6 @@ const updateHighscore = catchAsync(async (req, res, next) => {
   }
 
   const pool = await dbClient.getConnection(config.sql);
-  console.log(usersQueries.updateHighscoreQuery({ userId, HigH_Sc0rE }));
   await pool
     .request()
     .query(usersQueries.updateHighscoreQuery({ userId, HigH_Sc0rE }));

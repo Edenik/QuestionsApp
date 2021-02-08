@@ -14,8 +14,3 @@ export enum GameStatus {
   start = 'start',
   end = 'end',
 }
-// export enum QuestionDifficulity {
-//   low,
-//   medium,
-//   high,
-// }

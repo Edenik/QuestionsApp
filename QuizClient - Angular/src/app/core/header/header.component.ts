@@ -2,7 +2,7 @@ import { EventEmitter } from '@angular/core';
 import { Component, OnDestroy, OnInit, Output } from '@angular/core';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { User } from 'src/app/modules/admin/users/users-list/user.model';
+import { User } from 'src/app/core/models/user.model';
 import { AuthService } from 'src/app/modules/auth/auth.service';
 
 @Component({

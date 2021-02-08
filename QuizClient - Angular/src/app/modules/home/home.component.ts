@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/modules/auth/auth.service';
-import { User } from '../admin/users/users-list/user.model';
+import { User } from '../../core/models/user.model';
 
 @Component({
   selector: 'app-home',
