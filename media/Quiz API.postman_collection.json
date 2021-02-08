@@ -445,7 +445,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"email\":\"Edenik5@gmail.com\",\n\t\"username\":\"eden\",\n\t\"password\":\"12345678\",\n\t\"role\":\"admin\",\n\t\"highscore\":0\n}"
+									"raw": "{\n\t\"email\":\"test@test.com\",\n\t\"username\":\"test\",\n\t\"password\":\"12345678\",\n\t\"role\":\"admin\",\n\t\"highscore\":0\n}"
 								},
 								"url": {
 									"raw": "{{url}}/api/v1/users/1",
@@ -556,7 +556,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"username\":\"Eden Nahum\",\r\n    \"email\":\"edenik5@gmail.com\"\r\n}",
+									"raw": "{\r\n    \"username\":\"Test\",\r\n    \"email\":\"test@test.com\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -719,7 +719,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"email\":\"Edenik.mgfdhfjhkjhgkghac12dsfasfdasddas31321313@gmail.com\",\n\t\"username\":\"Eden\",\n\t\"password\":\"1234564645\"\n}"
+							"raw": "{\n\t\"email\":\"test@gmail.com\",\n\t\"username\":\"test\",\n\t\"password\":\"1234564645\"\n}"
 						},
 						"url": {
 							"raw": "{{url}}/api/v1/users/signup",
@@ -759,7 +759,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"email\":\"edenik5@gmail.com\",\n\t\"password\":\"12345678\"\n}"
+							"raw": "{\n\t\"email\":\"test@test.com\",\n\t\"password\":\"12345678\"\n}"
 						},
 						"url": {
 							"raw": "{{url}}/api/v1/users/login",
@@ -793,7 +793,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\":\"edenik5@gmail.com\"\r\n}",
+							"raw": "{\r\n    \"email\":\"test@test.com\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -843,7 +843,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\":\"edenik5@gmail.com\",\r\n    \"password\":\"987654321\"\r\n}",
+							"raw": "{\r\n    \"email\":\"test@test.com\",\r\n    \"password\":\"987654321\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -883,7 +883,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\":\"edenik5@gmail.com\",\r\n    \"password\":\"123456\",\r\n    \"newPassword\": \"1234567\"\r\n}",
+							"raw": "{\r\n    \"email\":\"test@test.com\",\r\n    \"password\":\"123456\",\r\n    \"newPassword\": \"1234567\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

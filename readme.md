@@ -5,7 +5,7 @@
 - [x] - Node.js
 - [x] - Express
 - [x] - MSSQL
-- [x] - [Postman - Download link to workspace (Recomended!)](https://github.com/Edenik/QuizApp/blob/main/media/Quiz%20API.postman_collection.json)
+- [x] - [Postman - Download link to workspace](https://raw.githubusercontent.com/Edenik/QuizApp/main/media/Quiz%20API.postman_collection.json) (Recommended!)
 
 ## Frontend
 
